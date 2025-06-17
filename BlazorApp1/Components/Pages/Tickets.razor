@@ -1,0 +1,116 @@
+@page "/tickets"
+@attribute [StreamRendering]
+
+<PageTitle>Tickets</PageTitle>
+
+<div class="container mt-4">
+    <!-- Added Title and Search Section -->
+    <div class="row mb-4">
+        <h2 class="mb-0">Tickets</h2>
+        <div class="col-12 col-md-6">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="fas fa-search text-muted"></i>
+                </span>
+                <input type="text" class="form-control border-start-0" 
+                       placeholder="Search tickets..." 
+                       @bind-value="searchTerm" 
+                       @bind-value:event="oninput" />
+            </div>
+        </div>
+    </div>
+
+    @if (tickets == null)
+    {
+        <p><em>Loading...</em></p>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var ticket in FilteredTickets)
+            {
+                <div class="col-12 mb-3">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="text-muted small mb-1">
+                                Updated @GetTimeAgo(ticket.Date), @ticket.Date.ToString("yyyy-MM-dd HH:mm")
+                            </div>
+                            <h5 class="card-title mb-2">@ticket.Header</h5>
+                            <p class="card-text text-secondary mb-4">
+                                @ticket.Details
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="text-dark">@ticket.Category</span>
+                                <a href="/tickets/@ticket.ID" class="text-decoration-none">
+                                    View <i class="fas fa-arrow-right small"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+            
+            @if (FilteredTickets.Count() == 0)
+            {
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        No tickets match your search criteria.
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private TicketContainer[]? tickets;
+    private string searchTerm = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Simulate asynchronous loading to demonstrate streaming rendering
+        await Task.Delay(500);
+
+        var startDate = DateTime.Now;
+        var categories = new[] { "Drammen", "Bærum", "Kongsberg", "Ringerike", "Feilmeld - enringer til Administrator", "Bestilling Mikrobiologen", "Martina Hansen Hospital", "Prioriteringsutvalg - Saksunderlag" };
+        tickets = Enumerable.Range(1, 5).Select(index => new TicketContainer
+        {
+            Date = startDate.AddDays(index),
+            Category = categories[Random.Shared.Next(categories.Length)],
+            Header = $"Ticket {index}",
+            ID = index,
+            Details = $"Details for ticket {index}",
+        }).ToArray();
+    }
+
+    // Added property to filter tickets based on search term
+    private IEnumerable<TicketContainer> FilteredTickets => tickets?.Where(t => 
+        string.IsNullOrWhiteSpace(searchTerm) || 
+        t.Header.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || 
+        t.Details.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || 
+        t.Category.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+    ) ?? Array.Empty<TicketContainer>();
+
+    private string GetTimeAgo(DateTime date)
+    {
+        var timeSpan = DateTime.Now - date;
+
+        if (timeSpan.TotalDays > 1)
+            return $"{(int)timeSpan.TotalDays}d ago";
+        else if (timeSpan.TotalHours > 1)
+            return $"{(int)timeSpan.TotalHours}h ago";
+        else if (timeSpan.TotalMinutes > 1)
+            return $"{(int)timeSpan.TotalMinutes}m ago";
+        else
+            return "just now";
+    }
+
+    private class TicketContainer
+    {
+        public DateTime Date { get; set; }
+        public int ID { get; set; }
+        public string? Header { get; set; }
+        public string? Details { get; set; }
+        public string? Category { get; set; }
+    }
+}

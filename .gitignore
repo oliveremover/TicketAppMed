@@ -1,0 +1,50 @@
+# Build results
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio Code settings
+.vscode/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# Publish output
+wwwroot/dist/
+wwwroot/node_modules/
+wwwroot/lib/
+
+# Node modules (if using npm/yarn)
+node_modules/
+
+# Logs
+*.log
+
+# Dependency directories
+packages/
+bower_components/
+
+# Environment files
+.env
+.env.*
+
+# Rider IDE files
+.idea/
+
+# Mac system files
+.DS_Store
+
+# Windows system files
+Thumbs.db
+
+# Azure Pipelines
+.azure-pipelines/
+
+# Blazor WebAssembly specific
+wwwroot/_framework/
+wwwroot/_content/
