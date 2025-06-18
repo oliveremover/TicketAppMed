@@ -1,12 +1,49 @@
+@inject NavigationManager NavigationManager
 
 <nav class="bottom-nav">
-    <a href="/" class="nav-item">
-        <i class="fas fa-home"></i><br />Home
+    <a href="/" class="nav-item @GetActiveClass("/")">
+            <i class="fas fa-home"></i>
+        <span>Home</span>
     </a>
-    <a href="/tickets" class="nav-item">
-        <i class="fas fa-ticktet"></i><br />Tickets
+    <a href="/tickets" class="nav-item @GetActiveClass("/tickets")">
+            <i class="fas fa-ticket-alt"></i>
+        <span>Tickets</span>
     </a>
-    <a href="/contact" class="nav-item">
-        <i class="fas fa-envelope"></i><br />Contact
+    <a href="/scanner" class="nav-item @GetActiveClass("/scanner")">
+        <div class="icon-circle">
+            <i class="fa-solid fa-qrcode"></i>
+        </div>
+        <span>Scan</span>
+    </a>
+    <a href="/add" class="nav-item @GetActiveClass("/add")">
+            <i class="fa-solid fa-plus"></i>
+        <span>Add</span>
+    </a>
+    <a href="/meny" class="nav-item @GetActiveClass("/meny")">
+            <i class="fas fa-envelope"></i>
+        <span>Meny</span>
     </a>
 </nav>
+
+@code {
+    private string GetActiveClass(string href)
+    {
+        var currentUri = NavigationManager.Uri;
+        var currentPath = new Uri(currentUri).PathAndQuery;
+        
+        // Check if at root path
+        if (href == "/" && (currentPath == "/" || string.IsNullOrEmpty(currentPath)))
+            return "active";
+            
+        // Check for other paths
+        if (href != "/" && currentPath.StartsWith(href))
+            return "active";
+            
+        return "";
+    }
+
+    protected override void OnInitialized()
+    {
+        NavigationManager.LocationChanged += (sender, e) => StateHasChanged();
+    }
+}

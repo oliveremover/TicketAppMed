@@ -1,101 +1,290 @@
 @page "/tickets"
 @attribute [StreamRendering]
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Tickets</PageTitle>
 
-<div class="container mt-4">
-    <!-- Added Title and Search Section -->
-    <div class="row mb-4">
-        <h2 class="mb-0">Tickets</h2>
-        <div class="col-12 col-md-6">
-            <div class="input-group">
-                <span class="input-group-text bg-white border-end-0">
-                    <i class="fas fa-search text-muted"></i>
-                </span>
-                <input type="text" class="form-control border-start-0" 
-                       placeholder="Search tickets..." 
-                       @bind-value="searchTerm" 
-                       @bind-value:event="oninput" />
+<div class="ticket-container">
+    <!-- Sticky header group -->
+    <div class="sticky-header-group">
+        <!-- Search header -->
+        <div class="search-header">
+            <div class="search-bar">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" 
+                       placeholder="Search Ticket Number" 
+                       @bind="searchTerm"
+                       @bind:event="oninput" />
+                @if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    <button class="clear-btn" @onclick="ClearSearch">
+                        <i class="fas fa-times"></i>
+                    </button>
+                }
+            </div>
+        </div>
+
+        <!-- Filter by category with divider and dropdown -->
+        <div class="filter-container">
+            <div class="filter-wrap">
+                <!-- Left side: My and All buttons -->
+                <div class="primary-filters">
+                    <button class="filter-chip @(showMyTickets ? "active" : "")" 
+                            @onclick="() => FilterMyTickets(true)">
+                        My
+                    </button>
+                    <button class="filter-chip @(!showMyTickets && selectedCategory == null ? "active" : "")" 
+                            @onclick="() => FilterMyTickets(false)">
+                        All
+                    </button>
+                </div>
+                
+                <!-- Vertical divider -->
+                <div class="filter-divider"></div>
+                
+                <!-- Right side: Category dropdown for mobile -->
+                <div class="category-dropdown">
+                    <button class="filter-chip dropdown-toggle" @onclick="ToggleCategoryDropdown">
+                        @(selectedCategory ?? "Categories") <i class="fas fa-chevron-down ms-1"></i>
+                    </button>
+                    
+                    @if (showCategoryDropdown)
+                    {
+                        <div class="category-dropdown-menu">
+                            <div class="dropdown-header">Filter by category</div>
+                            <button class="dropdown-item @(selectedCategory == null ? "active" : "")" 
+                                    @onclick="() => FilterByCategory(null)">
+                                All Categories
+                            </button>
+                            @foreach (var category in GetUniqueCategories())
+                            {
+                                <button class="dropdown-item @(selectedCategory == category ? "active" : "")" 
+                                        @onclick="() => FilterByCategory(category)">
+                                    @category
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
             </div>
         </div>
     </div>
 
     @if (tickets == null)
     {
-        <p><em>Loading...</em></p>
-    }
-    else
-    {
-        <div class="row">
-            @foreach (var ticket in FilteredTickets)
+        <!-- Skeleton loader for list items -->
+        <div class="tickets-list">
+            @for (int i = 0; i < 3; i++)
             {
-                <div class="col-12 mb-3">
-                    <div class="card shadow-sm">
-                        <div class="card-body">
-                            <div class="text-muted small mb-1">
-                                Updated @GetTimeAgo(ticket.Date), @ticket.Date.ToString("yyyy-MM-dd HH:mm")
-                            </div>
-                            <h5 class="card-title mb-2">@ticket.Header</h5>
-                            <p class="card-text text-secondary mb-4">
-                                @ticket.Details
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <span class="text-dark">@ticket.Category</span>
-                                <a href="/tickets/@ticket.ID" class="text-decoration-none">
-                                    View <i class="fas fa-arrow-right small"></i>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            }
-            
-            @if (FilteredTickets.Count() == 0)
-            {
-                <div class="col-12">
-                    <div class="alert alert-info">
-                        No tickets match your search criteria.
+                <div class="skeleton-ticket">
+                    <div class="skeleton-line skeleton-id"></div>
+                    <div class="skeleton-line skeleton-desc"></div>
+                    <div class="skeleton-footer">
+                        <div class="skeleton-line skeleton-ref"></div>
+                        <div class="skeleton-line skeleton-status"></div>
                     </div>
                 </div>
             }
         </div>
     }
+    else
+    {
+        <div class="tickets-list">
+            @foreach (var ticket in FilteredAndSortedTickets)
+            {
+                <div class="ticket-item" @onclick="() => NavigateToTicket(ticket.ID)">
+                    <div class="ticket-content">
+                        <div class="ticket-top-row">
+                            <div class="ticket-id">ST-@(ticket.ID.ToString().PadLeft(6, '0'))</div>
+                            <div class="ticket-time">@GetTimeAgo(ticket.Date)</div>
+                        </div>
+                        @if (!string.IsNullOrEmpty(ticket.Header))
+                        {
+                            <div class="ticket-title" title="@ticket.Header">@ticket.Header</div>
+                        }
+                        @if (!string.IsNullOrEmpty(ticket.Details))
+                        {
+                            <div class="ticket-desc">@ticket.Details</div>
+                        }
+                        <div class="ticket-footer">
+                            <div class="ticket-ref">@ticket.Category</div>
+                            <div class="status-badge @GetStatusClass(ticket.Status)">@GetStatusText(ticket.Status)</div>
+                        </div>
+                    </div>
+                    <div class="chevron">
+                        <i class="fas fa-chevron-right"></i>
+                    </div>
+                </div>
+            }
+            
+            @if (FilteredAndSortedTickets.Count() == 0)
+            {
+                <div class="empty-state">
+                    <i class="fas fa-ticket-alt empty-icon"></i>
+                    <p>No tickets found matching your criteria</p>
+                </div>
+            }
+        </div>
+    }
+
+    <!-- Create new ticket button -->
+    <div class="create-ticket-btn">
+        <a href="/tickets/new" class="btn-new-ticket">
+            <i class="fas fa-plus"></i> Create New Ticket
+        </a>
+    </div>
 </div>
 
 @code {
     private TicketContainer[]? tickets;
     private string searchTerm = "";
-
+    private string? selectedCategory = null;
+    private bool showMyTickets = false;
+    private bool showCategoryDropdown = false;
+    
     protected override async Task OnInitializedAsync()
     {
-        // Simulate asynchronous loading to demonstrate streaming rendering
+        // Simulate asynchronous loading
         await Task.Delay(500);
 
         var startDate = DateTime.Now;
-        var categories = new[] { "Drammen", "Bærum", "Kongsberg", "Ringerike", "Feilmeld - enringer til Administrator", "Bestilling Mikrobiologen", "Martina Hansen Hospital", "Prioriteringsutvalg - Saksunderlag" };
-        tickets = Enumerable.Range(1, 5).Select(index => new TicketContainer
+        var categories = new[] { "Drammen", "Bærum", "Kongsberg", "Ringerike", "Feilmeld", "Mikrobiologen", "Martina Hansen", "Prioritering" };
+        tickets = Enumerable.Range(1, 10).Select(index => new TicketContainer
         {
-            Date = startDate.AddDays(index),
+            Date = startDate.AddDays(-index),
             Category = categories[Random.Shared.Next(categories.Length)],
-            Header = $"Ticket {index}",
+            Header = $"Ticket {index}: {Lorem(4)}",
             ID = index,
-            Details = $"Details for ticket {index}",
+            Details = Lorem(20),
+            Status = Random.Shared.Next(3) // 0: New, 1: In Progress, 2: Resolved
         }).ToArray();
     }
+    
+    private string Lorem(int words)
+    {
+        var loremWords = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua".Split(' ');
+        return string.Join(" ", Enumerable.Range(0, words).Select(_ => loremWords[Random.Shared.Next(loremWords.Length)]));
+    }
 
-    // Added property to filter tickets based on search term
-    private IEnumerable<TicketContainer> FilteredTickets => tickets?.Where(t => 
-        string.IsNullOrWhiteSpace(searchTerm) || 
-        t.Header.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || 
-        t.Details.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || 
-        t.Category.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
-    ) ?? Array.Empty<TicketContainer>();
+    private void ClearSearch()
+    {
+        searchTerm = "";
+    }
+    
+    private void FilterByCategory(string? category)
+    {
+        selectedCategory = category;
+    }
+
+    private void FilterMyTickets(bool myTicketsOnly)
+    {
+        showMyTickets = myTicketsOnly;
+        // You would implement logic here to filter to only your tickets
+        // For example, you might filter by current user ID
+    }
+    
+    private void ToggleCategoryDropdown()
+    {
+        showCategoryDropdown = !showCategoryDropdown;
+    }
+    
+    // Close dropdown when clicking outside
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("window.addEventListener", "click", DotNetObjectReference.Create(this), "CloseDropdownOnClickOutside");
+        }
+    }
+    
+    [JSInvokable]
+    public void CloseDropdownOnClickOutside()
+    {
+        if (showCategoryDropdown)
+        {
+            showCategoryDropdown = false;
+            StateHasChanged();
+        }
+    }
+    
+    private IEnumerable<string> GetUniqueCategories()
+    {
+        return tickets?.Select(t => t.Category).Where(c => c != null).Distinct() ?? Array.Empty<string>();
+    }
+
+    private async Task NavigateToTicket(int id)
+    {
+        await JSRuntime.InvokeVoidAsync("window.location.href", $"/tickets/{id}");
+    }
+    
+    private string GetStatusClass(int status)
+    {
+        return status switch
+        {
+            0 => "open",
+            1 => "pending",
+            2 => "resolved",
+            _ => "open"
+        };
+    }
+    
+    private string GetStatusText(int status)
+    {
+        return status switch
+        {
+            0 => "Open",
+            1 => "Pending",
+            2 => "Resolved",
+            _ => "Open"
+        };
+    }
+
+    // Updated filtering and sorting logic
+    private IEnumerable<TicketContainer> FilteredAndSortedTickets 
+    { 
+        get
+        {
+            if (tickets == null)
+                return Array.Empty<TicketContainer>();
+                
+            var filtered = tickets.AsEnumerable();
+            
+            // Filter by "My" tickets if selected
+            if (showMyTickets)
+            {
+                // Replace this with your actual logic for determining "my" tickets
+                // For example: filtered = filtered.Where(t => t.AssignedTo == currentUserId);
+                filtered = filtered.Take(3); // Just for demonstration
+            }
+            
+            // Apply category filter if selected
+            if (!string.IsNullOrEmpty(selectedCategory))
+            {
+                filtered = filtered.Where(t => t.Category == selectedCategory);
+            }
+            
+            // Apply search term if provided
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                filtered = filtered.Where(t => 
+                    (t.Header != null && t.Header.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) || 
+                    (t.Details != null && t.Details.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) || 
+                    (t.Category != null && t.Category.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                );
+            }
+            
+            // Order by date, newest first
+            return filtered.OrderByDescending(t => t.Date);
+        }
+    }
 
     private string GetTimeAgo(DateTime date)
     {
         var timeSpan = DateTime.Now - date;
 
-        if (timeSpan.TotalDays > 1)
+        if (timeSpan.TotalDays > 30)
+            return date.ToString("MMM d");
+        else if (timeSpan.TotalDays > 1)
             return $"{(int)timeSpan.TotalDays}d ago";
         else if (timeSpan.TotalHours > 1)
             return $"{(int)timeSpan.TotalHours}h ago";
@@ -112,5 +301,6 @@
         public string? Header { get; set; }
         public string? Details { get; set; }
         public string? Category { get; set; }
+        public int Status { get; set; } // 0: New, 1: In Progress, 2: Resolved
     }
 }
