@@ -32,10 +32,12 @@
                     <button class="filter-chip @(showMyTickets ? "active" : "")" 
                             @onclick="() => FilterMyTickets(true)">
                         My
+                        <span>12</span>
                     </button>
                     <button class="filter-chip @(!showMyTickets && selectedCategory == null ? "active" : "")" 
                             @onclick="() => FilterMyTickets(false)">
                         All
+                        <span>23</span>
                     </button>
                 </div>
                 
@@ -44,7 +46,7 @@
                 
                 <!-- Right side: Category dropdown for mobile -->
                 <div class="category-dropdown">
-                    <button class="filter-chip dropdown-toggle" @onclick="ToggleCategoryDropdown">
+                    <button class="filter-chip" @onclick="ToggleCategoryDropdown">
                         @(selectedCategory ?? "Categories") <i class="fas fa-chevron-down ms-1"></i>
                     </button>
                     

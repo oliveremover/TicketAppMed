@@ -136,11 +136,6 @@
     margin-left: auto;
 }
 
-.dropdown-toggle {
-    display: flex;
-    align-items: center;
-}
-
 .category-dropdown-menu {
     position: absolute;
     top: 100%;
