@@ -1,5 +1,6 @@
 @attribute [StreamRendering]
-@inherits LayoutComponentBase
+@rendermode InteractiveServer
+
 <div class="wizard-step-container">
     <div class="wizard-content">
         <h3>Opprett en ny sak</h3>
@@ -21,7 +22,7 @@
 
 @code {
     [CascadingParameter]
-    public WizardModel? Model { get; set; }
+    public WizardModel Model { get; set; }
 
     [Parameter]
     public EventCallback OnCategorySelected { get; set; }
@@ -42,6 +43,7 @@
     {
         Model.Choice1 = category;
         
+        // Call the callback to notify parent component
         await OnCategorySelected.InvokeAsync();
     }
 }

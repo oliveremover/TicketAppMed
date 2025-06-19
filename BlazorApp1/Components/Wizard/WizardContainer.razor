@@ -1,55 +1,54 @@
-@attribute [StreamRendering]
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
 
-<div class="wizard-container">
-    <div class="sticky-header-group">
-        <div>
-            <div class="d-flex align-items-center justify-content-between border-bottom py-2 px-3">
-                <div class="flex-grow-1 text-center">
-                    <span class="fw-medium fs-4">Ny sak</span>
+<CascadingValue Value="Model">
+    <div class="wizard-container">
+        <div class="sticky-header-group">
+            <div>
+                <div class="d-flex align-items-center justify-content-between border-bottom py-2 px-3">
+                    <div class="flex-grow-1 text-center">
+                        <span class="fw-medium fs-4">Ny sak</span>
+                    </div>
+                    <button type="button" class="btn px-2 m-2" aria-label="Close" @onclick="@(()=>Navigation.NavigateTo("/tickets"))">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
                 </div>
-                <button type="button" class="btn px-2 m-2" aria-label="Close" @onclick="CloseWizard">
-                    <i class="bi bi-x-lg"></i>
-                </button>
             </div>
         </div>
-    </div>
-    <div class="content-area">
+        <div class="content-area">
 
-        @if (Step == 1)
-        {
-            <WizardStep1 OnCategorySelected="Next" />
-        }
-        else if (Step == 2)
-        {
-            <WizardStep2 />
-        }
-        else if (Step == 3)
-        {
-            <WizardStep3 />
-        }
-        else if( Step == 4 )
-        {
-            <h2>Results</h2>
-            <p>Choice 1 == @Model.Choice1.  Choice 2 == @Model.Choice2. Choice 3 == @Model.Choice3</p>
-        }
+            @if (Step == 1)
+            {
+                <WizardStep1 OnCategorySelected="Next" />
+            }
+            else if (Step == 2)
+            {
+                <WizardStep2 />
+            }
+            else if (Step == 3)
+            {
+                <WizardStep3 />
+            }
+            else if(Step == 4)
+            {
+                <h2>Results</h2>
+                <p>Choice 1 == @Model.Choice1.  Choice 2 == @Model.Choice2. Choice 3 == @Model.Choice3</p>
+            }
 
-        @if (Step != 1)
-        {
-            <button @onclick="Prev" class="btn btn-primary" >Prev</button>
-        }
-        @if (Step != 4 && Step != 1)
-        {
-            <button @onclick="Next" class="btn btn-primary" >Next</button>
-        }
+            @if (Step != 1)
+            {
+                <button @onclick="Prev" class="btn btn-primary">Prev</button>
+            }
+            @if (Step != 4 && Step != 1)
+            {
+                <button @onclick="Next" class="btn btn-primary">Next</button>
+            }
+        </div>
     </div>
-</div>
+</CascadingValue>
 
 @code {
-    [CascadingParameter]
-    public WizardModel Model { get; set; }
-
-    [Inject]
-    private NavigationManager Navigation { get; set; }
+    private WizardModel Model { get; set; } = new WizardModel();
 
     [Inject] 
     private IJSRuntime JSRuntime { get; set; }
