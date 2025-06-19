@@ -1,6 +1,49 @@
 ﻿@page "/"
+@attribute [StreamRendering]
+@inherits LayoutComponentBase
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="home-container">
+<!-- Sticky header group -->
+    <div class="sticky-header-group">
+        <!-- Search header -->
+        <div class="search-header">
+            <div class="search-bar-container">
+                <div class="search-bar">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" 
+                           placeholder="Search Ticket Number" 
+                           @bind="searchTerm"
+                           @bind:event="oninput" />
+                    @if (!string.IsNullOrEmpty(searchTerm))
+                    {
+                        <button class="clear-btn" @onclick="ClearSearch">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    }
+                </div>
+                <button class="btn btn-link notification-btn" title="Notifications">
+                    <i class="bi bi-bell"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Content area -->
+    <div class="content-area">
+        <h1>Welcome Home</h1>
+        <!-- Add your home page content here -->
+    </div>
+    <CreateTicketBtn />
+</div>
+
+@code {
+    private string searchTerm = "";
+
+    private void ClearSearch()
+    {
+        searchTerm = "";
+    }
+}
 

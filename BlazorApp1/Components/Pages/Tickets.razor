@@ -1,6 +1,7 @@
 @page "/tickets"
 @attribute [StreamRendering]
 @inject IJSRuntime JSRuntime
+@using BlazorApp1.Components.Ticket
 
 <PageTitle>Tickets</PageTitle>
 
@@ -46,13 +47,13 @@
                 
                 <!-- Right side: Category dropdown for mobile -->
                 <div class="category-dropdown">
-                    <button class="filter-chip" @onclick="ToggleCategoryDropdown">
-                        @(selectedCategory ?? "Categories") <i class="fas fa-chevron-down ms-1"></i>
+                    <button class="filter-chip" @onclick="ToggleCategoryDropdown" @onclick:preventDefault="true" @onclick:stopPropagation="true">
+                        @(selectedCategory ?? "Categories") <i class="bi bi-chevron-down"></i>
                     </button>
                     
                     @if (showCategoryDropdown)
                     {
-                        <div class="category-dropdown-menu">
+                        <div class="category-dropdown-menu" @onclick:stopPropagation="true">
                             <div class="dropdown-header">Filter by category</div>
                             <button class="dropdown-item @(selectedCategory == null ? "active" : "")" 
                                     @onclick="() => FilterByCategory(null)">
@@ -94,29 +95,7 @@
         <div class="tickets-list">
             @foreach (var ticket in FilteredAndSortedTickets)
             {
-                <div class="ticket-item" @onclick="() => NavigateToTicket(ticket.ID)">
-                    <div class="ticket-content">
-                        <div class="ticket-top-row">
-                            <div class="ticket-id">ST-@(ticket.ID.ToString().PadLeft(6, '0'))</div>
-                            <div class="ticket-time">@GetTimeAgo(ticket.Date)</div>
-                        </div>
-                        @if (!string.IsNullOrEmpty(ticket.Header))
-                        {
-                            <div class="ticket-title" title="@ticket.Header">@ticket.Header</div>
-                        }
-                        @if (!string.IsNullOrEmpty(ticket.Details))
-                        {
-                            <div class="ticket-desc">@ticket.Details</div>
-                        }
-                        <div class="ticket-footer">
-                            <div class="ticket-ref">@ticket.Category</div>
-                            <div class="status-badge @GetStatusClass(ticket.Status)">@GetStatusText(ticket.Status)</div>
-                        </div>
-                    </div>
-                    <div class="chevron">
-                        <i class="fas fa-chevron-right"></i>
-                    </div>
-                </div>
+                <Ticket Ticket="@ticket" OnTicketClick="NavigateToTicket" />
             }
             
             @if (FilteredAndSortedTickets.Count() == 0)
@@ -130,15 +109,11 @@
     }
 
     <!-- Create new ticket button -->
-    <div class="create-ticket-btn">
-        <a href="/tickets/new" class="btn-new-ticket">
-            <i class="fas fa-plus"></i> Create New Ticket
-        </a>
-    </div>
+    <CreateTicketBtn />
 </div>
 
 @code {
-    private TicketContainer[]? tickets;
+    private Ticket.TicketContainer[]? tickets;
     private string searchTerm = "";
     private string? selectedCategory = null;
     private bool showMyTickets = false;
@@ -151,7 +126,7 @@
 
         var startDate = DateTime.Now;
         var categories = new[] { "Drammen", "Bærum", "Kongsberg", "Ringerike", "Feilmeld", "Mikrobiologen", "Martina Hansen", "Prioritering" };
-        tickets = Enumerable.Range(1, 10).Select(index => new TicketContainer
+        tickets = Enumerable.Range(1, 10).Select(index => new Ticket.TicketContainer
         {
             Date = startDate.AddDays(-index),
             Category = categories[Random.Shared.Next(categories.Length)],
@@ -218,36 +193,14 @@
     {
         await JSRuntime.InvokeVoidAsync("window.location.href", $"/tickets/{id}");
     }
-    
-    private string GetStatusClass(int status)
-    {
-        return status switch
-        {
-            0 => "open",
-            1 => "pending",
-            2 => "resolved",
-            _ => "open"
-        };
-    }
-    
-    private string GetStatusText(int status)
-    {
-        return status switch
-        {
-            0 => "Open",
-            1 => "Pending",
-            2 => "Resolved",
-            _ => "Open"
-        };
-    }
 
     // Updated filtering and sorting logic
-    private IEnumerable<TicketContainer> FilteredAndSortedTickets 
+    private IEnumerable<Ticket.TicketContainer> FilteredAndSortedTickets 
     { 
         get
         {
             if (tickets == null)
-                return Array.Empty<TicketContainer>();
+                return Array.Empty<Ticket.TicketContainer>();
                 
             var filtered = tickets.AsEnumerable();
             
@@ -278,31 +231,5 @@
             // Order by date, newest first
             return filtered.OrderByDescending(t => t.Date);
         }
-    }
-
-    private string GetTimeAgo(DateTime date)
-    {
-        var timeSpan = DateTime.Now - date;
-
-        if (timeSpan.TotalDays > 30)
-            return date.ToString("MMM d");
-        else if (timeSpan.TotalDays > 1)
-            return $"{(int)timeSpan.TotalDays}d ago";
-        else if (timeSpan.TotalHours > 1)
-            return $"{(int)timeSpan.TotalHours}h ago";
-        else if (timeSpan.TotalMinutes > 1)
-            return $"{(int)timeSpan.TotalMinutes}m ago";
-        else
-            return "just now";
-    }
-
-    private class TicketContainer
-    {
-        public DateTime Date { get; set; }
-        public int ID { get; set; }
-        public string? Header { get; set; }
-        public string? Details { get; set; }
-        public string? Category { get; set; }
-        public int Status { get; set; } // 0: New, 1: In Progress, 2: Resolved
     }
 }

@@ -1,0 +1,103 @@
+.ticket-item {
+    background-color: #ffffff;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    cursor: pointer;
+    transition: transform 0.15s ease-in-out;
+}
+
+.ticket-item:active {
+    transform: scale(0.99);
+}
+
+.ticket-content {
+    flex-grow: 1;
+}
+
+.ticket-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;  /* Increased space before title */
+}
+
+.ticket-id {
+    color: #6c757d;  /* More subdued color for IDs */
+    font-weight: 400;
+    font-size: 13px;
+    font-family: monospace, sans-serif;  /* Monospaced font for better readability of IDs */
+}
+
+.ticket-title {
+    font-weight: 600;  /* Heavier weight for better hierarchy */
+    font-size: 15px;  /* Larger than ID for proper hierarchy */
+    color: #212529;
+    margin-bottom: 6px;
+    line-height: 1.4;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;  /* Prevent wrapping for cleaner look */
+}
+
+.ticket-desc {
+    font-size: 13px;
+    color: #6c757d;
+    margin-bottom: 8px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;  /* Limit to 2 lines */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    max-height: 36px;  /* Ensure consistent height */
+}
+
+.ticket-time {
+    font-size: 12px;
+    color: #6c757d;
+    font-weight: normal;
+}
+
+.ticket-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ticket-ref {
+    font-size: 12px;
+    color: #6c757d;
+}
+
+.status-badge {
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.status-badge.open {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+}
+
+.status-badge.pending {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #fd7e14;
+}
+
+.status-badge.resolved {
+    background-color: rgba(25, 135, 84, 0.1);
+    color: #198754;
+}
+
+.chevron {
+    color: #adb5bd;
+    margin-left: 12px;
+}

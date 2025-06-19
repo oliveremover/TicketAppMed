@@ -1,0 +1,81 @@
+@inject IJSRuntime JSRuntime
+
+<div class="ticket-item" @onclick="() => OnTicketClick.InvokeAsync(Ticket.ID)">
+    <div class="ticket-content">
+        <div class="ticket-top-row">
+            <div class="ticket-id">ST-@(Ticket.ID.ToString().PadLeft(6, '0'))</div>
+            <div class="ticket-time">@GetTimeAgo(Ticket.Date)</div>
+        </div>
+        @if (!string.IsNullOrEmpty(Ticket.Header))
+        {
+            <div class="ticket-title" title="@Ticket.Header">@Ticket.Header</div>
+        }
+        @if (!string.IsNullOrEmpty(Ticket.Details))
+        {
+            <div class="ticket-desc">@Ticket.Details</div>
+        }
+        <div class="ticket-footer">
+            <div class="ticket-ref">@Ticket.Category</div>
+            <div class="status-badge @GetStatusClass(Ticket.Status)">@GetStatusText(Ticket.Status)</div>
+        </div>
+    </div>
+    <div class="chevron">
+        <i class="fas fa-chevron-right"></i>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public TicketContainer Ticket { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<int> OnTicketClick { get; set; }
+
+    private string GetStatusClass(int status)
+    {
+        return status switch
+        {
+            0 => "open",
+            1 => "pending",
+            2 => "resolved",
+            _ => "open"
+        };
+    }
+    
+    private string GetStatusText(int status)
+    {
+        return status switch
+        {
+            0 => "Open",
+            1 => "Pending",
+            2 => "Resolved",
+            _ => "Open"
+        };
+    }
+
+    private string GetTimeAgo(DateTime date)
+    {
+        var timeSpan = DateTime.Now - date;
+
+        if (timeSpan.TotalDays > 30)
+            return date.ToString("MMM d");
+        else if (timeSpan.TotalDays > 1)
+            return $"{(int)timeSpan.TotalDays}d ago";
+        else if (timeSpan.TotalHours > 1)
+            return $"{(int)timeSpan.TotalHours}h ago";
+        else if (timeSpan.TotalMinutes > 1)
+            return $"{(int)timeSpan.TotalMinutes}m ago";
+        else
+            return "just now";
+    }
+
+    public class TicketContainer
+    {
+        public DateTime Date { get; set; }
+        public int ID { get; set; }
+        public string? Header { get; set; }
+        public string? Details { get; set; }
+        public string? Category { get; set; }
+        public int Status { get; set; } // 0: New, 1: In Progress, 2: Resolved
+    }
+}
