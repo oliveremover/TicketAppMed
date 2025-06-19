@@ -33,12 +33,12 @@
                     <button class="filter-chip @(showMyTickets ? "active" : "")" 
                             @onclick="() => FilterMyTickets(true)">
                         My
-                        <span>12</span>
+                        <span>@GetMyTicketsCount()</span>
                     </button>
                     <button class="filter-chip @(!showMyTickets && selectedCategory == null ? "active" : "")" 
                             @onclick="() => FilterMyTickets(false)">
                         All
-                        <span>23</span>
+                        <span>@GetAllTicketsCount()</span>
                     </button>
                 </div>
                 
@@ -47,8 +47,26 @@
                 
                 <!-- Right side: Category dropdown for mobile -->
                 <div class="category-dropdown">
-                    <button class="filter-chip" @onclick="ToggleCategoryDropdown" @onclick:preventDefault="true" @onclick:stopPropagation="true">
-                        @(selectedCategory ?? "Categories") <i class="bi bi-chevron-down"></i>
+                    <button class="filter-chip @(selectedCategory != null ? "active-filter" : "")" 
+                            @onclick="@(selectedCategory != null 
+                                ? EventCallback.Factory.Create(this, (Action)ClearCategoryFilter) 
+                                : EventCallback.Factory.Create(this, (Action)ToggleCategoryDropdown))" 
+                            @onclick:preventDefault="true" 
+                            @onclick:stopPropagation="true">
+                        @(selectedCategory ?? "Categories") 
+                        @if (selectedCategory != null)
+                        {
+                            <div class="chevron">
+                                <i class="bi bi-x-circle"></i>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="chevron">
+                                <i class="bi bi-chevron-down"></i>
+                            </div>
+                            
+                        }
                     </button>
                     
                     @if (showCategoryDropdown)
@@ -116,7 +134,7 @@
     private TicketComp.TicketContainer[]? tickets;
     private string searchTerm = "";
     private string? selectedCategory = null;
-    private bool showMyTickets = false;
+    private bool showMyTickets = true; // Changed from false to true
     private bool showCategoryDropdown = false;
     
     protected override async Task OnInitializedAsync()
@@ -151,6 +169,8 @@
     private void FilterByCategory(string? category)
     {
         selectedCategory = category;
+
+        showCategoryDropdown = false; // Close dropdown after selection
     }
 
     private void FilterMyTickets(bool myTicketsOnly)
@@ -231,5 +251,25 @@
             // Order by date, newest first
             return filtered.OrderByDescending(t => t.Date);
         }
+    }
+
+    private int GetMyTicketsCount()
+    {
+        if (tickets == null)
+            return 0;
+            
+        // Replace this with your actual logic for determining "my" tickets
+        // For demo purposes, using the same logic as in FilteredAndSortedTickets
+        return tickets.Take(3).Count();
+    }
+
+    private int GetAllTicketsCount()
+    {
+        return tickets?.Length ?? 0;
+    }
+
+    private void ClearCategoryFilter()
+    {
+        selectedCategory = null;
     }
 }

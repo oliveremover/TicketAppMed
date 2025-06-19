@@ -1,4 +1,3 @@
-
 .filter-container {
     border-bottom: 1px solid #dee2e6;
     white-space: nowrap;
@@ -102,6 +101,7 @@
     color: #495057;
     transition: all 0.2s;
     cursor: pointer;
+    display: flex;
 }
 .filter-chip i {
     font-size: 14px;
@@ -115,6 +115,10 @@
     background-color: #0d6efd;
     color: white;
     border-color: #0d6efd;
+}
+
+.filter-chip.active-filter {
+    border-color: #0078d4;
 }
 
 /* Category dropdown */
@@ -273,7 +277,7 @@
 
 .chevron {
     color: #adb5bd;
-    margin-left: 12px;
+    margin-left: 4px;
 }
 
 
