@@ -34,15 +34,16 @@
                 <h2>Results</h2>
                 <p>Choice 1 == @Model.Choice1.  Choice 2 == @Model.Choice2. Choice 3 == @Model.Choice3</p>
             }
-
-            @if (Step != 1)
-            {
-                <button @onclick="Prev" class="btn btn-primary">Prev</button>
-            }
-            @if (Step != 4 && Step != 1)
-            {
-                <button @onclick="Next" class="btn btn-primary">Next</button>
-            }
+            <div class="d-flex justify-content-between mt-3">
+                @if (Step != 1)
+                {
+                    <button @onclick="Prev" class="btn btn-primary">Prev</button>
+                }
+                @if (Step != 4 && Step != 1)
+                {
+                    <button @onclick="Next" class="btn btn-primary">Next</button>
+                }
+            </div>
         </div>
     </div>
 </CascadingValue>
