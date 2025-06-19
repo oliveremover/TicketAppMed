@@ -1,0 +1,47 @@
+@attribute [StreamRendering]
+@inherits LayoutComponentBase
+<div class="wizard-step-container">
+    <div class="wizard-content">
+        <h3>Opprett en ny sak</h3>
+        <p>Velg hvilken type sak du vil opprette</p>
+
+        <div class="category-list">
+            @foreach (var category in Categories)
+            {
+                <button class="category-button" @onclick="() => SelectCategory(category)">
+                    @category
+                        <div class="chevron">
+                            <i class="bi bi-chevron-right"></i>
+                        </div>
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter]
+    public WizardModel? Model { get; set; }
+
+    [Parameter]
+    public EventCallback OnCategorySelected { get; set; }
+
+    private List<string> Categories { get; set; } = new List<string>
+    {
+        "Drammen",
+        "Bærum",
+        "Kongsberg",
+        "Ringerike",
+        "Feilmeld - øringer til Administrator",
+        "Bestilling Mikrobiologien",
+        "Martina Hansen Hospital",
+        "Prioriteringsutvalg - Saksunderlag"
+    };
+
+    private async Task SelectCategory(string category)
+    {
+        Model.Choice1 = category;
+        
+        await OnCategorySelected.InvokeAsync();
+    }
+}

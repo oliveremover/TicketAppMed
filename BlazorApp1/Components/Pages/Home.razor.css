@@ -83,11 +83,3 @@
     font-size: 18px;
 }
 
-
-/* Responsive adjustments */
-@media (min-width: 768px) {
-    .home-container {
-        max-width: 600px;
-        margin: 0 auto;
-    }
-}

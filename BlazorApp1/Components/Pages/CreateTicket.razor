@@ -1,0 +1,14 @@
+@page "/createTicket"
+@attribute [StreamRendering]
+@inherits LayoutComponentBase
+
+<PageTitle>Create Ticket</PageTitle>
+
+<CascadingValue Value="Model">
+    <WizardContainer />
+</CascadingValue>
+
+
+@code {
+    public WizardModel Model { get; set; } = new WizardModel();
+}

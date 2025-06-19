@@ -1,6 +1,16 @@
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+
 <!-- Create new ticket button -->
 <div class="create-ticket-btn">
-    <a href="/tickets/new" class="btn-new-ticket">
-        <i class="fas fa-plus"></i> Create New Ticket
-    </a>
+    <button href="/createTicket" class="btn-new-ticket" @onclick="NavigateToCreateTicket">
+        <i class="bi bi-plus-lg"></i> Create New Ticket
+    </button>
 </div>
+
+@code {
+    private void NavigateToCreateTicket()
+    {
+        NavigationManager.NavigateTo("/createTicket");
+    }
+}
