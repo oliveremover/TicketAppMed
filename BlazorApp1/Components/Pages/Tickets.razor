@@ -211,7 +211,7 @@
     
     private IEnumerable<string> GetUniqueCategories()
     {
-        return tickets?.Select(t => t.Category).Where(c => c != null).Distinct() ?? Array.Empty<string>();
+        return tickets?.Select(t => t.Category).Where(c => c != null).Distinct().Cast<string>() ?? Array.Empty<string>();
     }
 
     private async Task NavigateToTicket(int id)
