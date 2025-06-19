@@ -1,0 +1,28 @@
+.wizard-step-container {
+    max-width: 500px;
+    margin: 0 auto;
+}
+.wizard-content {
+    padding: 0 8px;
+    margin-top: 20px;
+}
+.wizard-content h3 {
+    font-size: 18px;
+    margin-bottom: 4px;
+}
+
+.wizard-content p {
+    color: #555;
+    margin-bottom: 16px;
+}
+
+.upload-btn {
+    width: 120px;
+    height: 80px;
+    border-radius: 4px;
+    background-color: #fff;
+    border-color: #007bff;
+    color: #007bff;
+    cursor: pointer;
+    padding: 10px;
+}

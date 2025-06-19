@@ -41,7 +41,7 @@
 
     private async Task SelectCategory(string category)
     {
-        Model.Choice1 = category;
+        Model.Category = category;
         
         // Call the callback to notify parent component
         await OnCategorySelected.InvokeAsync();
