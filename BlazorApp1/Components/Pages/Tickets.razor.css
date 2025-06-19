@@ -5,17 +5,6 @@
     -webkit-overflow-scrolling: touch;
 }
 
-.ticket-card {
-    transition: transform 0.2s, box-shadow 0.2s;
-    cursor: pointer;
-}
-
-.ticket-card:hover, .ticket-card:focus {
-    transform: translateY(-2px);
-    box-shadow: 0 .5rem 1rem rgba(0,0,0,.15) !important;
-}
-
-/* Light theme styling */
 /* Base container */
 .ticket-container {
     background-color: #f8f9fa;
@@ -350,12 +339,4 @@
 @keyframes shimmer {
     0% { background-position: -200% 0; }
     100% { background-position: 200% 0; }
-}
-
-/* Responsive adjustments */
-@media (min-width: 768px) {
-    .ticket-container {
-        max-width: 600px;
-        margin: 0 auto;
-    }
 }

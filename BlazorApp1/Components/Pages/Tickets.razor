@@ -19,7 +19,7 @@
                 @if (!string.IsNullOrEmpty(searchTerm))
                 {
                     <button class="clear-btn" @onclick="ClearSearch">
-                        <i class="fas fa-times"></i>
+                        <i class="bi bi-plus-lg"></i>
                     </button>
                 }
             </div>
@@ -95,7 +95,7 @@
         <div class="tickets-list">
             @foreach (var ticket in FilteredAndSortedTickets)
             {
-                <Ticket Ticket="@ticket" OnTicketClick="NavigateToTicket" />
+                <TicketComp Ticket="@ticket" OnTicketClick="NavigateToTicket" />
             }
             
             @if (FilteredAndSortedTickets.Count() == 0)
@@ -113,7 +113,7 @@
 </div>
 
 @code {
-    private Ticket.TicketContainer[]? tickets;
+    private TicketComp.TicketContainer[]? tickets;
     private string searchTerm = "";
     private string? selectedCategory = null;
     private bool showMyTickets = false;
@@ -126,7 +126,7 @@
 
         var startDate = DateTime.Now;
         var categories = new[] { "Drammen", "Bærum", "Kongsberg", "Ringerike", "Feilmeld", "Mikrobiologen", "Martina Hansen", "Prioritering" };
-        tickets = Enumerable.Range(1, 10).Select(index => new Ticket.TicketContainer
+        tickets = Enumerable.Range(1, 10).Select(index => new TicketComp.TicketContainer
         {
             Date = startDate.AddDays(-index),
             Category = categories[Random.Shared.Next(categories.Length)],
@@ -195,12 +195,12 @@
     }
 
     // Updated filtering and sorting logic
-    private IEnumerable<Ticket.TicketContainer> FilteredAndSortedTickets 
+    private IEnumerable<TicketComp.TicketContainer> FilteredAndSortedTickets 
     { 
         get
         {
             if (tickets == null)
-                return Array.Empty<Ticket.TicketContainer>();
+                return Array.Empty<TicketComp.TicketContainer>();
                 
             var filtered = tickets.AsEnumerable();
             
