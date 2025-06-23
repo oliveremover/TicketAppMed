@@ -51,10 +51,7 @@
 
 @code {
     private WizardModel Model { get; set; } = new WizardModel();
-
-    [Inject] 
-    private IJSRuntime JSRuntime { get; set; }
-
+    
     public int Step { get; set; } = 1;
 
     private void Next()
