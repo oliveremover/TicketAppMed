@@ -15,6 +15,8 @@ namespace BlazorApp1.Models
         public List<Comment> Comments { get; set; } = new List<Comment>();
         public string? AssignedTo { get; set; }
         public string CreatedBy { get; set; } = string.Empty;
+        public int? EquipmentId { get; set; }
+        public Equipment? Equipment { get; set; }
         
         // Helper method to generate a formatted ticket ID
         public string GetFormattedID() => ID.ToString().PadLeft(6, '0');

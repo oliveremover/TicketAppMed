@@ -15,12 +15,21 @@ namespace BlazorApp1.Services
         Task<bool> DeleteTicketAsync(int id);
         Task<List<Ticket>> GetMyTicketsAsync(string userId);
         Task<List<string>> GetCategoriesAsync();
+        Task<bool> AssignEquipmentToTicketAsync(int ticketId, int equipmentId);
+        Task<bool> RemoveEquipmentFromTicketAsync(int ticketId);
     }
     
     public class TicketService : ITicketService
     {
         private static List<Ticket> _mockTickets = new();
         private static bool _initialized = false;
+        
+        private readonly IEquipmentService _equipmentService;
+        
+        public TicketService(IEquipmentService equipmentService)
+        {
+            _equipmentService = equipmentService;
+        }
         
         private void InitializeMockData()
         {
@@ -138,6 +147,37 @@ namespace BlazorApp1.Services
                 .Distinct()
                 .OrderBy(c => c)
                 .ToList();
+        }
+        
+        public async Task<bool> AssignEquipmentToTicketAsync(int ticketId, int equipmentId)
+        {
+            InitializeMockData();
+            await Task.Delay(400); // Simulate network delay
+            
+            var ticket = _mockTickets.FirstOrDefault(t => t.ID == ticketId);
+            if (ticket == null) return false;
+            
+            var equipment = await _equipmentService.GetEquipmentByIdAsync(equipmentId);
+            if (equipment == null) return false;
+            
+            ticket.EquipmentId = equipmentId;
+            ticket.Equipment = equipment;
+            
+            return true;
+        }
+        
+        public async Task<bool> RemoveEquipmentFromTicketAsync(int ticketId)
+        {
+            InitializeMockData();
+            await Task.Delay(300); // Simulate network delay
+            
+            var ticket = _mockTickets.FirstOrDefault(t => t.ID == ticketId);
+            if (ticket == null) return false;
+            
+            ticket.EquipmentId = null;
+            ticket.Equipment = null;
+            
+            return true;
         }
     }
 }

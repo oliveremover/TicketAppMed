@@ -3,6 +3,7 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager Navigation
 @inject ITicketService TicketService
+@inject IEquipmentService EquipmentService
 @using BlazorApp1.Components.StatusBadge
 @using BlazorApp1.Models
 @using BlazorApp1.Services
@@ -49,13 +50,50 @@
                     <i class="bi bi-tag"></i>
                     <span>@ticket.Category</span>
                 </div>
-                @if (!string.IsNullOrEmpty(ticket.AssignedTo))
-                {
-                    <div class="metadata-item">
-                        <i class="bi bi-person"></i>
-                        <span>@ticket.AssignedTo</span>
-                    </div>
-                }
+            </div>
+            
+            <!-- Equipment section -->
+            <div class="content-section">
+                <h4 class="section-title">
+                    <i class="bi bi-tools me-2"></i>Equipment
+                </h4>
+                <div class="content-body">
+                    @if (ticket.Equipment != null)
+                    {
+                        <div class="equipment-card">
+                            <div class="equipment-header">
+                                <h5>@ticket.Equipment.DeviceType</h5>
+                                <button class="btn btn-sm btn-outline-danger" @onclick="RemoveEquipment">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
+                            <div class="equipment-details">
+                                <div class="equipment-detail-item">
+                                    <span class="label">Serial Number:</span>
+                                    <span class="value">@ticket.Equipment.SerialNumber</span>
+                                </div>
+                                <div class="equipment-detail-item">
+                                    <span class="label">Model:</span>
+                                    <span class="value">@ticket.Equipment.Model</span>
+                                </div>
+                                <div class="equipment-detail-item">
+                                    <span class="label">Brand:</span>
+                                    <span class="value">@ticket.Equipment.Brand</span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="empty-state">
+                            <i class="bi bi-tools large-icon"></i>
+                            <p>No equipment associated with this ticket</p>
+                            <button class="btn btn-sm btn-outline-primary" @onclick="OpenEquipmentModal">
+                                <i class="bi bi-plus-lg me-1"></i>Add equipment
+                            </button>
+                        </div>
+                    }
+                </div>
             </div>
             
             <!-- Sections with consistent styling -->
@@ -112,12 +150,33 @@
                             <div class="comments-list">
                                 @foreach (var comment in ticket.Comments.OrderBy(c => c.Date))
                                 {
-                                    <div class="comment-item">
-                                        <div class="comment-header">
-                                            <span class="comment-author">@comment.Author</span>
-                                            <span class="comment-time">@GetRelativeTime(comment.Date)</span>
+                                    <div class="comment-item @(IsCurrentUser(comment.Author) ? "comment-mine" : "")">
+                                        <div class="comment-avatar">
+                                            @if (IsCurrentUser(comment.Author))
+                                            {
+                                                <div class="avatar-circle self">
+                                                    <span>@GetInitials(comment.Author)</span>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div class="avatar-circle">
+                                                    <span>@GetInitials(comment.Author)</span>
+                                                </div>
+                                            }
                                         </div>
-                                        <div class="comment-text">@comment.Text</div>
+                                        <div class="comment-content">
+                                            <div class="comment-header">
+                                                <span class="comment-author">@FormatAuthorName(comment.Author)</span>
+                                                <span class="comment-time">
+                                                    <i class="bi bi-clock me-1"></i>
+                                                    @GetRelativeTime(comment.Date)
+                                                </span>
+                                            </div>
+                                            <div class="comment-bubble">
+                                                @comment.Text
+                                            </div>
+                                        </div>
                                     </div>
                                 }
                             </div>
@@ -158,6 +217,136 @@
             </div>
         </div>
 
+        <!-- Equipment selection modal -->
+        @if (showEquipmentModal)
+        {
+            <div class="modal-backdrop show"></div>
+            <div class="modal d-block" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <i class="bi bi-tools me-2"></i>Select Equipment
+                            </h5>
+                            <button type="button" class="btn-close" @onclick="CloseEquipmentModal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="search-container mb-4">
+                                <label for="equipmentSearch" class="form-label visually-hidden">Search equipment</label>
+                                <div class="input-group input-group-lg">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="bi bi-search text-muted"></i>
+                                    </span>
+                                    <input type="text" 
+                                           class="form-control form-control-lg border-start-0" 
+                                           id="equipmentSearch"
+                                           placeholder="Search by name, serial number, or model..." 
+                                           @bind-value="equipmentSearchTerm" 
+                                           @bind-value:event="oninput" 
+                                           @onkeyup="SearchEquipment"
+                                           @ref="searchInput"
+                                           autocomplete="off" />
+                                @if (!string.IsNullOrEmpty(equipmentSearchTerm))
+                                {
+                                    <button class="btn btn-outline-secondary border-start-0" 
+                                            type="button" 
+                                            @onclick="ClearSearch">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                }
+                                </div>
+                            </div>
+                            
+                            <div class="results-container">
+                                @if (isSearching)
+                                {
+                                    <div class="search-feedback text-center p-4">
+                                        <div class="spinner-grow text-primary mb-2" role="status">
+                                            <span class="visually-hidden">Loading...</span>
+                                        </div>
+                                        <p class="text-muted">Searching equipment...</p>
+                                    </div>
+                                }
+                                else if (equipmentSearchResults.Any())
+                                {
+                                    <p class="results-count mb-3">Found @equipmentSearchResults.Count equipment items</p>
+                                    <div class="equipment-search-results">
+                                        @foreach (var equipment in equipmentSearchResults)
+                                        {
+                                            <div class="equipment-result-item @(selectedEquipmentId == equipment.EquipmentNumber ? "selected" : "")" 
+                                                 @onclick="() => SelectEquipment(equipment.EquipmentNumber)">
+                                                <div class="equipment-item-inner">
+                                                    <div class="equipment-icon">
+                                                        <i class="bi bi-hdd"></i>
+                                                    </div>
+                                                    <div class="equipment-info">
+                                                        <div class="equipment-primary">
+                                                            <span class="equipment-name">@equipment.DeviceType</span>
+                                                            <span class="equipment-brand">@equipment.Brand</span>
+                                                        </div>
+                                                        <div class="equipment-secondary">
+                                                            <span class="equipment-model">
+                                                                <i class="bi bi-tag-fill me-1"></i>@equipment.Model
+                                                            </span>
+                                                            <span class="equipment-serial">
+                                                                <i class="bi bi-upc me-1"></i>@equipment.SerialNumber
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    @if (selectedEquipmentId == equipment.EquipmentNumber)
+                                                    {
+                                                        <div class="selected-indicator">
+                                                            <i class="bi bi-check-circle-fill"></i>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                }
+                                else if (!string.IsNullOrEmpty(equipmentSearchTerm))
+                                {
+                                    <div class="empty-search-results">
+                                        <i class="bi bi-search large-icon"></i>
+                                        <p class="empty-title">No matching equipment found</p>
+                                        <p class="empty-message text-muted">Try different keywords or check the spelling</p>
+                                        <button class="btn btn-outline-secondary mt-2" @onclick="ClearSearch">
+                                            <i class="bi bi-arrow-counterclockwise me-1"></i>Clear search
+                                        </button>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="initial-state">
+                                        <i class="bi bi-tools large-icon"></i>
+                                        <p class="empty-title">Search for equipment</p>
+                                        <p class="empty-message text-muted">Type in the search box above to find equipment</p>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="footer-hint @(selectedEquipmentId == null ? "" : "d-none")">
+                                <i class="bi bi-info-circle me-1"></i>
+                                <span>Select an equipment item to continue</span>
+                            </div>
+                            <div class="button-group">
+                                <button type="button" class="btn btn-outline-secondary" @onclick="CloseEquipmentModal">
+                                    <i class="bi bi-x me-1"></i>Cancel
+                                </button>
+                                <button type="button" 
+                                        class="btn btn-primary btn-assign" 
+                                        @onclick="AssignSelectedEquipment"
+                                        disabled="@(selectedEquipmentId == null)">
+                                    <i class="bi bi-link me-1"></i>Assign Equipment
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        
         @if (ShowDeleteConfirmation)
         {
             <div class="modal-backdrop show"></div>
@@ -189,10 +378,23 @@
     private Ticket? ticket;
     private bool ShowDeleteConfirmation { get; set; } = false;
     private string newComment = string.Empty;
+    
+    // Equipment-related properties
+    private bool showEquipmentModal = false;
+    private string equipmentSearchTerm = string.Empty;
+    private List<Equipment> equipmentSearchResults = new();
+    private int? selectedEquipmentId = null;
+    private bool isSearching = false;
+    private ElementReference searchInput;
 
     protected override async Task OnInitializedAsync()
     {
         ticket = await TicketService.GetTicketByIdAsync(Id);
+        // If ticket has an equipment ID but the equipment object is null, load it
+        if (ticket?.EquipmentId != null && ticket?.Equipment == null)
+        {
+            ticket.Equipment = await EquipmentService.GetEquipmentByIdAsync(ticket.EquipmentId.Value);
+        }
     }
 
     private void NavigateBack()
@@ -269,5 +471,109 @@
         }
         
         return $"{size:0.##} {sizes[order]}";
+    }
+
+    private bool IsCurrentUser(string author)
+    {
+        // In a real app, compare with the current authenticated user
+        return author == "current.user@example.com";
+    }
+
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+            return "?";
+            
+        // If it's an email, use the first letter of the local part
+        if (name.Contains('@'))
+        {
+            var localPart = name.Split('@')[0];
+            return localPart.Substring(0, 1).ToUpper();
+        }
+        
+        // For full names, take first letter of first and last name
+        var parts = name.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (parts.Length >= 2)
+            return (parts[0].Substring(0, 1) + parts[parts.Length - 1].Substring(0, 1)).ToUpper();
+        else
+            return name.Substring(0, 1).ToUpper();
+    }
+
+    private string FormatAuthorName(string author)
+    {
+        // If it's an email address, show just the local part
+        if (author.Contains('@'))
+        {
+            var localPart = author.Split('@')[0];
+            // Convert formats like 'john.doe' or 'john_doe' to 'John Doe'
+            localPart = localPart.Replace('.', ' ').Replace('_', ' ');
+            return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(localPart);
+        }
+        
+        return author;
+    }
+    
+    // Equipment-related methods
+    private void OpenEquipmentModal()
+    {
+        showEquipmentModal = true;
+        selectedEquipmentId = null;
+        equipmentSearchTerm = string.Empty;
+        equipmentSearchResults = new List<Equipment>();
+        _ = SearchEquipment();
+        
+        // No need for JavaScript interop - the modal will handle focus when it appears
+        StateHasChanged();
+    }
+    
+    private void CloseEquipmentModal()
+    {
+        showEquipmentModal = false;
+    }
+
+    private async Task ClearSearch()
+    {
+        equipmentSearchTerm = string.Empty;
+        equipmentSearchResults = new List<Equipment>();
+        await SearchEquipment();
+    }
+    
+    private async Task SearchEquipment()
+    {
+        isSearching = true;
+        await Task.Delay(300); // Debounce
+        equipmentSearchResults = await EquipmentService.SearchEquipmentAsync(equipmentSearchTerm);
+        isSearching = false;
+    }
+    
+    private void SelectEquipment(int id)
+    {
+        selectedEquipmentId = id;
+    }
+    
+    private async Task AssignSelectedEquipment()
+    {
+        if (selectedEquipmentId == null || ticket == null) return;
+        
+        if (await TicketService.AssignEquipmentToTicketAsync(ticket.ID, selectedEquipmentId.Value))
+        {
+            // Refresh the equipment data
+            var equipment = await EquipmentService.GetEquipmentByIdAsync(selectedEquipmentId.Value);
+            ticket.EquipmentId = selectedEquipmentId.Value;
+            ticket.Equipment = equipment;
+            
+            CloseEquipmentModal();
+        }
+    }
+    
+    private async Task RemoveEquipment()
+    {
+        if (ticket == null) return;
+        
+        if (await TicketService.RemoveEquipmentFromTicketAsync(ticket.ID))
+        {
+            ticket.EquipmentId = null;
+            ticket.Equipment = null;
+        }
     }
 }
