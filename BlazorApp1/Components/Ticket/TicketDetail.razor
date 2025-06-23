@@ -29,8 +29,8 @@
     }
     else
     {
-        <!-- Ticket info card -->
-        <div class="ticket-card">
+        <!-- Ticket info card with mobile-first design -->
+        <div class="ticket-card @(isCommentFocused ? "comment-focused" : "")">
             <!-- Status and ID section -->
             <div class="ticket-card-header">
                 <div class="ticket-id">@ticket.GetFormattedID()</div>
@@ -138,8 +138,8 @@
                 </div>
             </div>
             
-            <!-- Conversation section -->
-            <div class="content-section">
+            <!-- Conversation section with mobile-first design -->
+            <div class="content-section conversation-section">
                 <h4 class="section-title">
                     <i class="bi bi-chat-left-text me-2"></i>Conversation
                 </h4>
@@ -150,7 +150,7 @@
                             <div class="comments-list">
                                 @foreach (var comment in ticket.Comments.OrderBy(c => c.Date))
                                 {
-                                    <div class="comment-item @(IsCurrentUser(comment.Author) ? "comment-mine" : "")">
+                                    <div id="comment-@comment.ID" class="comment-item @(IsCurrentUser(comment.Author) ? "comment-mine" : "")">
                                         <div class="comment-avatar">
                                             @if (IsCurrentUser(comment.Author))
                                             {
@@ -188,33 +188,49 @@
                                 <p>No messages yet</p>
                             </div>
                         }
-                        <div class="comment-input mt-3">
-                            <textarea class="form-control" rows="2" placeholder="Type your message here..." @bind="newComment"></textarea>
-                            <div class="d-flex justify-content-end mt-2">
-                                <button class="btn btn-primary" @onclick="AddComment">
-                                    <i class="bi bi-send me-1"></i>Send
-                                </button>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </div>
+
+            <!-- Fixed mobile-friendly comment input -->
+            <div class="comment-input-container @(isCommentFocused ? "expanded" : "")">
+                <div class="comment-input">
+                    <textarea class="form-control" 
+                              placeholder="Type your message..." 
+                              rows="1"
+                              @bind="newComment" 
+                              @onfocus="() => isCommentFocused = true"
+                              @onblur="() => isCommentFocused = false"
+                              @ref="commentTextArea"></textarea>
+                    <button class="btn-send @(string.IsNullOrWhiteSpace(newComment) ? "disabled" : "")" 
+                            @onclick="AddComment"
+                            disabled="@(string.IsNullOrWhiteSpace(newComment))">
+                        <i class="bi bi-send-fill"></i>
+                    </button>
+                </div>
+            </div>
         </div>
-        <!-- Action buttons -->
-        <div class="action-buttons">
-            <div class="action-buttons-left">
-                <button class="btn btn-danger" @onclick="@(() => ShowDeleteConfirmation = true)">
-                    <i class="bi bi-trash me-2"></i>Delete
-                </button>
-            </div>
-            <div class="action-buttons-right">
-                <button class="btn btn-outline-secondary" @onclick="OpenStatusModal">
-                    <i class="bi bi-arrow-repeat me-2"></i>Update Status
-                </button>
-                <button class="btn btn-primary" @onclick="EditTicket">
-                    <i class="bi bi-pencil me-2"></i>Edit
-                </button>
-            </div>
+
+        <!-- Floating action button for mobile -->
+        <div class="fab-container">
+            <button class="fab fab-main" @onclick="() => showActionMenu = !showActionMenu">
+                <i class="bi bi-three-dots"></i>
+            </button>
+            
+            @if (showActionMenu)
+            {
+                <div class="fab-menu">
+                    <button class="fab fab-item" @onclick="EditTicket">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="fab fab-item" @onclick="OpenStatusModal">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </button>
+                    <button class="fab fab-item fab-danger" @onclick="@(() => ShowDeleteConfirmation = true)">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </div>
+            }
         </div>
 
         <!-- Equipment selection modal -->
@@ -222,7 +238,7 @@
         {
             <div class="modal-backdrop show"></div>
             <div class="modal d-block" tabindex="-1" role="dialog">
-                <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-dialog modal-fullscreen-sm-down modal-dialog-centered modal-lg">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">
@@ -386,6 +402,10 @@
     private int? selectedEquipmentNumber = null;
     private bool isSearching = false;
     private ElementReference searchInput;
+    private ElementReference commentTextArea;
+
+    private bool isCommentFocused = false;
+    private bool showActionMenu = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -431,7 +451,7 @@
         var comment = new Comment
         {
             ID = ticket.Comments.Count > 0 ? ticket.Comments.Max(c => c.ID) + 1 : 1,
-            Text = newComment,
+            Text = newComment.Trim(),
             Date = DateTime.Now,
             Author = "current.user@example.com"  // In a real app, get from authentication
         };
@@ -441,7 +461,17 @@
         // In a real app, you would save this to the backend
         await TicketService.UpdateTicketAsync(ticket);
         
-        newComment = string.Empty;  // Clear the input
+        // Clear the input
+        newComment = string.Empty;
+        
+        // Scroll to the new comment (optional)
+        await JSRuntime.InvokeVoidAsync("scrollToElementById", "comment-" + comment.ID);
+        
+        // Reset the textarea height
+        await JSRuntime.InvokeVoidAsync("autoResizeTextarea", commentTextArea);
+        
+        // Reset focus state
+        isCommentFocused = false;
     }
     
     private string GetRelativeTime(DateTime date)
@@ -574,6 +604,21 @@
         {
             ticket.EquipmentNumber = null;
             ticket.Equipment = null;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            try
+            {
+                await JSRuntime.InvokeVoidAsync("autoResizeTextarea", commentTextArea);
+            }
+            catch (Exception)
+            {
+                // Handle any JS interop errors silently
+            }
         }
     }
 }
