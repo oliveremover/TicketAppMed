@@ -6,7 +6,10 @@
     <div class="ticket-content">
         <div class="ticket-top-row">
             <div class="ticket-id">@Ticket.GetFormattedID()</div>
-            <div class="ticket-time">@Ticket.GetTimeAgo()</div>
+            <div class="ticket-time">
+                <i class="bi bi-calendar3 me-1"></i>
+                <span>@Ticket.GetTimeAgo()</span>
+            </div>
         </div>
         @if (!string.IsNullOrEmpty(Ticket.Header))
         {
@@ -17,12 +20,15 @@
             <div class="ticket-desc">@Ticket.Details</div>
         }
         <div class="ticket-footer">
-            <div class="ticket-ref">@Ticket.Category</div>
+            <div class="ticket-ref">
+                <i class="bi bi-tag me-1"></i>
+                <span>@Ticket.Category</span>
+            </div>
             <StatusBadge Status="@Ticket.Status" />
         </div>
     </div>
     <div class="chevron">
-        <i class="fas fa-chevron-right"></i>
+        <i class="bi bi-chevron-right"></i>
     </div>
 </div>
 
