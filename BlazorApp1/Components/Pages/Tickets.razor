@@ -1,6 +1,7 @@
 @page "/tickets"
 @rendermode InteractiveServer
 @inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
 @using BlazorApp1.Components.Ticket
 
 <PageTitle>Tickets</PageTitle>
@@ -212,7 +213,7 @@
 
     private async Task NavigateToTicket(int id)
     {
-        await JSRuntime.InvokeVoidAsync("window.location.href", $"/tickets/{id}");
+        Navigation.NavigateTo($"/tickets/{id}");
     }
 
     // Updated filtering and sorting logic
