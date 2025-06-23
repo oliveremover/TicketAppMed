@@ -3,7 +3,7 @@
 @rendermode InteractiveServer
 
 <!-- Removed the positioning div wrapper -->
-<button class="action-btn @GetButtonClasses()" @onclick="HandleClick">
+<button class="action-btn @GetButtonClasses()" @onclick="HandleClick" aria-label="@GetAccessibleName()">
     @if (!string.IsNullOrEmpty(IconClass))
     {
         <i class="@IconClass @(IconOnly ? "icon-only" : "")"></i>
@@ -33,6 +33,9 @@
     [Parameter]
     public string NavigateTo { get; set; } = "";
 
+    [Parameter]
+    public string AriaLabel { get; set; } = "";
+
     private string GetButtonClasses()
     {
         var classes = "btn";
@@ -47,7 +50,29 @@
 
         return classes;
     }
-
+    private string GetAccessibleName()
+    {
+        // Use provided AriaLabel if present, otherwise use Text, 
+        // or provide a fallback for icon-only buttons
+        if (!string.IsNullOrEmpty(AriaLabel))
+            return AriaLabel;
+        
+        if (!string.IsNullOrEmpty(Text))
+            return Text;
+            
+        // Try to provide a reasonable name based on the navigation target
+        if (!string.IsNullOrEmpty(NavigateTo))
+        {
+            if (NavigateTo == "/scan")
+                return "Scan QR code";
+            if (NavigateTo == "/createTicket")
+                return "Create new ticket";
+                
+            return $"Navigate to {NavigateTo.TrimStart('/')}";
+        }
+        
+        return "Button"; // Default fallback
+    }
     private void HandleClick()
     {
         if (!string.IsNullOrEmpty(NavigateTo))
