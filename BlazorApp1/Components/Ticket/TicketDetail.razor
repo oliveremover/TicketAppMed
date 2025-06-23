@@ -1,0 +1,204 @@
+@page "/tickets/{Id:int}"
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+@inject NavigationManager Navigation
+
+<PageTitle>Ticket Details</PageTitle>
+
+<div class="ticket-detail-container">
+    <!-- Back button header -->
+    <div class="ticket-header">
+        <button aria-label="Navigate back" class="back-button" @onclick="() => Navigation.NavigateTo('/tickets')">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <h3 class="mb-0">Ticket Details</h3>
+    </div>
+
+    @if (ticket == null)
+    {
+        <div class="loading-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Ticket info card -->
+        <div class="ticket-card">
+            <!-- Status and ID section -->
+            <div class="ticket-card-header">
+                <div class="ticket-id">@(ticket.ID.ToString().PadLeft(6, '0'))</div>
+                <div class="status-badge @GetStatusClass(ticket.Status.ToString())">
+                    <i class="bi @GetStatusIcon(ticket.Status.ToString()) me-1"></i>
+                    @GetStatusText(ticket.Status.ToString())
+                </div>
+            </div>
+            
+            <!-- Title section -->
+            <h2 class="ticket-title">@ticket.Header</h2>
+            
+            <!-- Metadata section -->
+            <div class="ticket-metadata">
+                <div class="metadata-item">
+                    <i class="bi bi-calendar3"></i>
+                    <span>@ticket.Date.ToString("MMM d, yyyy")</span>
+                </div>
+                <div class="metadata-item">
+                    <i class="bi bi-tag"></i>
+                    <span>@ticket.Category</span>
+                </div>
+            </div>
+            
+            <!-- Sections with consistent styling -->
+            <div class="content-section">
+                <h4 class="section-title">
+                    <i class="bi bi-info-circle me-2"></i>Details
+                </h4>
+                <div class="content-body">
+                    <p class="ticket-description">@ticket.Details</p>
+                </div>
+            </div>
+            
+            <!-- Attachments section -->
+            <div class="content-section">
+                <h4 class="section-title">
+                    <i class="bi bi-paperclip me-2"></i>Attachments
+                </h4>
+                <div class="content-body">
+                    <div class="empty-state">
+                        <i class="bi bi-files large-icon"></i>
+                        <p>No attachments yet</p>
+                        <button class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-plus-lg me-1"></i>Add attachment
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Conversation section -->
+            <div class="content-section">
+                <h4 class="section-title">
+                    <i class="bi bi-chat-left-text me-2"></i>Conversation
+                </h4>
+                <div class="content-body">
+                    <div class="conversation-container">
+                        <div class="empty-state">
+                            <i class="bi bi-chat large-icon"></i>
+                            <p>No messages yet</p>
+                        </div>
+                        <div class="comment-input mt-3">
+                            <textarea class="form-control" rows="2" placeholder="Type your message here..."></textarea>
+                            <div class="d-flex justify-content-end mt-2">
+                                <button class="btn btn-primary">
+                                    <i class="bi bi-send me-1"></i>Send
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Action buttons -->
+        <div class="action-buttons">
+            <div class="action-buttons-left">
+                <button class="btn btn-danger" @onclick="@(() => ShowDeleteConfirmation = true)">
+                    <i class="bi bi-trash me-2"></i>Delete
+                </button>
+            </div>
+            <div class="action-buttons-right">
+                <button class="btn btn-outline-secondary" @onclick="OpenStatusModal">
+                    <i class="bi bi-arrow-repeat me-2"></i>Update Status
+                </button>
+                <button class="btn btn-primary" @onclick="EditTicket">
+                    <i class="bi bi-pencil me-2"></i>Edit
+                </button>
+            </div>
+        </div>
+
+        @if (ShowDeleteConfirmation)
+        {
+            <div class="modal-backdrop show"></div>
+            <div class="modal d-block" tabindex="-1" role="dialog">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Delete Confirmation</h5>
+                            <button type="button" class="btn-close" @onclick="@(() => ShowDeleteConfirmation = false)" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Are you sure you want to delete this ticket? This action cannot be undone.</p>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" @onclick="@(() => ShowDeleteConfirmation = false)">Cancel</button>
+                            <button type="button" class="btn btn-danger" @onclick="DeleteTicket">Delete Ticket</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    
+    private TicketComp.TicketContainer? ticket;
+    private bool ShowDeleteConfirmation { get; set; } = false;
+
+    private string GetStatusClass(string status)
+    {
+        // Example mapping, adjust as needed
+        return status switch
+        {
+            "Open" => "status-open",
+            "Closed" => "status-closed",
+            "Pending" => "status-pending",
+            _ => "status-unknown"
+        };
+    }
+
+    private string GetStatusIcon(string status)
+    {
+        // Return a Bootstrap icon class based on status
+        return status switch
+        {
+            "Open" => "bi-unlock",
+            "Closed" => "bi-lock",
+            "Pending" => "bi-hourglass-split",
+            _ => "bi-question-circle"
+        };
+    }
+
+    private string GetStatusText(string status)
+    {
+        // Return a display string for the status
+        return status switch
+        {
+            "Open" => "Open",
+            "Closed" => "Closed",
+            "Pending" => "Pending",
+            _ => "Unknown"
+        };
+    }
+    
+    private void EditTicket()
+    {
+        // Will implement edit functionality later
+        // Could navigate to edit page or show an edit form
+    }
+    
+    private void OpenStatusModal()
+    {
+        // Will implement status update functionality later
+        // Could show a dropdown or modal with status options
+    }
+    
+    private void DeleteTicket()
+    {
+        // Implement delete functionality
+        ShowDeleteConfirmation = false;
+        Navigation.NavigateTo("/tickets"); // Navigate back after deletion
+    }
+}
