@@ -33,7 +33,7 @@
             <!-- Status and ID section -->
             <div class="ticket-card-header">
                 <div class="ticket-id">@ticket.GetFormattedID()</div>
-                <StatusBadge Status="@ticket.Status" />
+                <StatusBadge Status="@( (TicketStatus)ticket.Status )" />
             </div>
             
             <!-- Title section -->
