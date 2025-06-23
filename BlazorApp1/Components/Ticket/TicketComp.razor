@@ -1,4 +1,6 @@
 @inject IJSRuntime JSRuntime
+@using BlazorApp1.Components.StatusBadge
+@using BlazorApp1.Models
 
 <div class="ticket-item" @onclick="() => OnTicketClick.InvokeAsync(Ticket.ID)">
     <div class="ticket-content">
@@ -16,7 +18,7 @@
         }
         <div class="ticket-footer">
             <div class="ticket-ref">@Ticket.Category</div>
-            <div class="status-badge @GetStatusClass(Ticket.Status)">@GetStatusText(Ticket.Status)</div>
+            <StatusBadge Status="@Ticket.Status" />
         </div>
     </div>
     <div class="chevron">
@@ -30,29 +32,6 @@
 
     [Parameter]
     public EventCallback<int> OnTicketClick { get; set; }
-
-    private string GetStatusClass(int status)
-    {
-        return status switch
-        {
-            0 => "open",
-            1 => "pending",
-            2 => "resolved",
-            _ => "open"
-        };
-    }
-    
-    private string GetStatusText(int status)
-    {
-        return status switch
-        {
-            0 => "Open",
-            1 => "Pending",
-            2 => "Resolved",
-            _ => "Open"
-        };
-    }
-
     private string GetTimeAgo(DateTime date)
     {
         var timeSpan = DateTime.Now - date;
@@ -76,6 +55,6 @@
         public string? Header { get; set; }
         public string? Details { get; set; }
         public string? Category { get; set; }
-        public int Status { get; set; } // 0: New, 1: In Progress, 2: Resolved
+        public StatusTypes Status { get; set; }
     }
 }

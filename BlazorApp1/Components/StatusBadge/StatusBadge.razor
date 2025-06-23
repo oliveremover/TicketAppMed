@@ -1,0 +1,31 @@
+@namespace BlazorApp1.Components.StatusBadge
+@using BlazorApp1.Models
+
+<div class="status-badge @GetStatusClass()">@GetStatusText()</div>
+
+@code {
+    [Parameter]
+    public StatusTypes Status { get; set; }
+
+    private string GetStatusClass()
+    {
+        return Status switch
+        {
+            StatusTypes.Open => "open",
+            StatusTypes.Pending => "pending",
+            StatusTypes.Resolved => "resolved",
+            _ => "open"
+        };
+    }
+
+    private string GetStatusText()
+    {
+        return Status switch
+        {
+            StatusTypes.Open => "Open",
+            StatusTypes.Pending => "Pending",
+            StatusTypes.Resolved => "Resolved",
+            _ => "Open"
+        };
+    }
+}

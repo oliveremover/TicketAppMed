@@ -2,13 +2,14 @@
 @rendermode InteractiveServer
 @inject IJSRuntime JSRuntime
 @inject NavigationManager Navigation
+@using BlazorApp1.Components.StatusBadge
 
 <PageTitle>Ticket Details</PageTitle>
 
 <div class="ticket-detail-container">
     <!-- Back button header -->
     <div class="ticket-header">
-        <button aria-label="Navigate back" class="back-button" @onclick="() => Navigation.NavigateTo('/tickets')">
+        <button aria-label="Navigate back" class="back-button" @onclick="NavigateBack">
             <i class="bi bi-arrow-left"></i>
         </button>
         <h3 class="mb-0">Ticket Details</h3>
@@ -29,10 +30,7 @@
             <!-- Status and ID section -->
             <div class="ticket-card-header">
                 <div class="ticket-id">@(ticket.ID.ToString().PadLeft(6, '0'))</div>
-                <div class="status-badge @GetStatusClass(ticket.Status.ToString())">
-                    <i class="bi @GetStatusIcon(ticket.Status.ToString()) me-1"></i>
-                    @GetStatusText(ticket.Status.ToString())
-                </div>
+                <StatusBadge Status="@Ticket.Status" />
             </div>
             
             <!-- Title section -->
@@ -147,40 +145,30 @@
     private TicketComp.TicketContainer? ticket;
     private bool ShowDeleteConfirmation { get; set; } = false;
 
-    private string GetStatusClass(string status)
+    protected override async Task OnInitializedAsync()
     {
-        // Example mapping, adjust as needed
-        return status switch
+        // Simulate loading delay (this would be a real API call in production)
+        await Task.Delay(800);
+        
+        // Create some mock data based on the Id
+        // In a real app, you would fetch this from a service or API
+        var random = new Random(Id); // Use the Id as seed for consistent results
+        var categories = new[] { "Drammen", "Bærum", "Kongsberg", "Ringerike", "Feilmeld", "Mikrobiologen" };
+        var statuses = new[] { "Open", "Closed", "Pending" };
+        
+        ticket = new TicketComp.TicketContainer
         {
-            "Open" => "status-open",
-            "Closed" => "status-closed",
-            "Pending" => "status-pending",
-            _ => "status-unknown"
+            ID = Id,
+            Header = $"Ticket {Id}: Issue report",
+            Details = "This is a detailed description of the ticket. It includes all the relevant information needed to understand and resolve the issue.",
+            Date = DateTime.Now.AddDays(-random.Next(1, 30)),
+            Category = categories[random.Next(categories.Length)]
         };
     }
 
-    private string GetStatusIcon(string status)
+    private void NavigateBack()
     {
-        // Return a Bootstrap icon class based on status
-        return status switch
-        {
-            "Open" => "bi-unlock",
-            "Closed" => "bi-lock",
-            "Pending" => "bi-hourglass-split",
-            _ => "bi-question-circle"
-        };
-    }
-
-    private string GetStatusText(string status)
-    {
-        // Return a display string for the status
-        return status switch
-        {
-            "Open" => "Open",
-            "Closed" => "Closed",
-            "Pending" => "Pending",
-            _ => "Unknown"
-        };
+        Navigation.NavigateTo("/tickets");
     }
     
     private void EditTicket()
