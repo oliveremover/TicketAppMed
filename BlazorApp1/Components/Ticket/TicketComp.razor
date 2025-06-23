@@ -3,7 +3,7 @@
 <div class="ticket-item" @onclick="() => OnTicketClick.InvokeAsync(Ticket.ID)">
     <div class="ticket-content">
         <div class="ticket-top-row">
-            <div class="ticket-id">ST-@(Ticket.ID.ToString().PadLeft(6, '0'))</div>
+            <div class="ticket-id">@(Ticket.ID.ToString().PadLeft(6, '0'))</div>
             <div class="ticket-time">@GetTimeAgo(Ticket.Date)</div>
         </div>
         @if (!string.IsNullOrEmpty(Ticket.Header))
