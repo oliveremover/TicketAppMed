@@ -19,19 +19,12 @@
             <!-- File upload and camera buttons -->
             <div class="d-flex justify-content-start gap-3 mt-4">
                 <!-- File upload button -->
-                <div class="text-center">
-                    <label for="fileUpload" class="upload-btn btn btn-dark d-flex flex-column align-items-center justify-content-center">
-                        <i class="bi bi-cloud-arrow-up fs-4"></i>
-                        <span class="mt-1">Last opp fil</span>
-                    </label>
-                    <input type="file" id="fileUpload" class="d-none" @onchange="HandleFileSelected" />
-                </div>
-                
+                <Btn IconClass="bi bi-file-earmark-arrow-up" 
+                     Text="Last opp fil" />
                 <!-- Camera button -->
-                <button class="upload-btn btn btn-dark d-flex flex-column align-items-center justify-content-center" @onclick="OpenCamera">
-                    <i class="bi bi-camera fs-4"></i>
-                    <span class="mt-1">Ta bilde</span>
-                </button>
+                <Btn IconClass="bi bi-camera" 
+                     Text="Ta bilde" 
+                     OnClick="OpenCamera" />
             </div>
         </div>
     </div>
