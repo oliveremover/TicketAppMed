@@ -1,0 +1,62 @@
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<!-- Removed the positioning div wrapper -->
+<button class="action-btn @GetButtonClasses()" @onclick="HandleClick">
+    @if (!string.IsNullOrEmpty(IconClass))
+    {
+        <i class="@IconClass @(IconOnly ? "icon-only" : "")"></i>
+    }
+    @if (!IconOnly)
+    {
+        @Text
+    }
+</button>
+
+@code {
+    [Parameter]
+    public string Style { get; set; } = "primary"; // Options: primary, secondary
+
+    [Parameter]
+    public string IconClass { get; set; } = "bi bi-plus-lg"; // Bootstrap icon class
+
+    [Parameter]
+    public string Text { get; set; } = "";
+
+    [Parameter]
+    public bool IconOnly { get; set; } = false;
+
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+
+    [Parameter]
+    public string NavigateTo { get; set; } = "";
+
+    private string GetButtonClasses()
+    {
+        var classes = "btn";
+
+        if (Style == "secondary")
+            classes += " btn-secondary";
+        else
+            classes += " btn-primary";
+            
+        if (IconOnly)
+            classes += " icon-only-btn";
+
+        return classes;
+    }
+
+    private void HandleClick()
+    {
+        if (!string.IsNullOrEmpty(NavigateTo))
+        {
+            NavigationManager.NavigateTo(NavigateTo);
+        }
+        else if (OnClick.HasDelegate)
+        {
+            OnClick.InvokeAsync();
+        }
+    }
+}

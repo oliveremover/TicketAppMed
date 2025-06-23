@@ -4,17 +4,18 @@
 
 <div class="wizard-step-container">
     <div class="wizard-content">
-        <h3>Velg utstyr</h3>
-        <p>Søk opp og velg ønsket utstyr.</p>
-        <div class="search-header">
-            <div class="search-bar">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" 
-                       placeholder="Søk etter utstyr">
+        <div class="mx-2">
+            <h3>Velg utstyr</h3>
+            <p>Søk opp og velg ønsket utstyr.</p>
+            <div class="search-header">
+                <div class="search-bar">
+                    <i class="fas fa-search search-icon"></i>
+                    <input type="text" placeholder="Søk etter utstyr">
+                </div>
             </div>
         </div>
         <div class="equipment-list">
-           
+
         </div>
     </div>
 </div>
@@ -25,6 +26,6 @@
 
     private async Task SelectEquipment(string equipment)
     {
-        Model.Equipment = equipment; 
+        Model.Equipment = equipment;
     }
 }

@@ -1,36 +1,38 @@
 <div class="wizard-step-container">
     <div class="wizard-content">
-        <h3>Generalt</h3>
-        <p>Fyll in viktig informasjon.</p>
+        <div class="mx-2">
+            <h3>Generalt</h3>
+            <p>Fyll in viktig informasjon.</p>
 
-        <!-- Header field -->
-        <div class="form-group mb-3">
-            <label for="header" class="form-label">Emne</label>
-            <input type="text" class="form-control" id="emne" placeholder="Skriv inn emne">
-        </div>
-        
-        <!-- Details field -->
-        <div class="form-group mb-3">
-            <label for="details" class="form-label">Detaljer</label>
-            <textarea class="form-control" id="detaljer" rows="4" placeholder="Skriv inn detaljer"></textarea>
-        </div>
-
-        <!-- File upload and camera buttons -->
-        <div class="d-flex justify-content-start gap-3 mt-4">
-            <!-- File upload button -->
-            <div class="text-center">
-                <label for="fileUpload" class="upload-btn btn btn-dark d-flex flex-column align-items-center justify-content-center">
-                    <i class="bi bi-cloud-arrow-up fs-4"></i>
-                    <span class="mt-1">Last opp fil</span>
-                </label>
-                <input type="file" id="fileUpload" class="d-none" @onchange="HandleFileSelected" />
+            <!-- Header field -->
+            <div class="form-group mb-3">
+                <label for="header" class="form-label">Emne</label>
+                <input type="text" class="form-control" id="emne" placeholder="Skriv inn emne">
             </div>
             
-            <!-- Camera button -->
-            <button class="upload-btn btn btn-dark d-flex flex-column align-items-center justify-content-center" @onclick="OpenCamera">
-                <i class="bi bi-camera fs-4"></i>
-                <span class="mt-1">Ta bilde</span>
-            </button>
+            <!-- Details field -->
+            <div class="form-group mb-3">
+                <label for="details" class="form-label">Detaljer</label>
+                <textarea class="form-control" id="detaljer" rows="4" placeholder="Skriv inn detaljer"></textarea>
+            </div>
+
+            <!-- File upload and camera buttons -->
+            <div class="d-flex justify-content-start gap-3 mt-4">
+                <!-- File upload button -->
+                <div class="text-center">
+                    <label for="fileUpload" class="upload-btn btn btn-dark d-flex flex-column align-items-center justify-content-center">
+                        <i class="bi bi-cloud-arrow-up fs-4"></i>
+                        <span class="mt-1">Last opp fil</span>
+                    </label>
+                    <input type="file" id="fileUpload" class="d-none" @onchange="HandleFileSelected" />
+                </div>
+                
+                <!-- Camera button -->
+                <button class="upload-btn btn btn-dark d-flex flex-column align-items-center justify-content-center" @onclick="OpenCamera">
+                    <i class="bi bi-camera fs-4"></i>
+                    <span class="mt-1">Ta bilde</span>
+                </button>
+            </div>
         </div>
     </div>
 </div>

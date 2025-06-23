@@ -1,4 +1,3 @@
-using System;
 namespace BlazorApp1.Models
 {
     public class WizardModel

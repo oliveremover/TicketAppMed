@@ -35,7 +35,10 @@
         <h1>Welcome Home</h1>
         <!-- Add your home page content here -->
     </div>
-    <CreateTicketBtn />
+    <div class="action-buttons">
+        <Btn IconOnly=true IconClass="bi-qr-code-scan" Style="secondary" NavigateTo="/scan" />
+        <Btn IconOnly=true NavigateTo="/createTicket" />
+    </div>
 </div>
 
 @code {

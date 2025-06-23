@@ -1,0 +1,44 @@
+/* Style classes */
+.action-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    border-radius: 67px;
+    width: 100%;
+    max-width: 450px;
+}
+
+.primary-action-btn {
+    background-color: #0d6efd;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.2);
+}
+
+.secondary-action-btn {
+    background-color: #6c757d;
+    color: #fff;
+    box-shadow: 0 4px 8px rgba(108, 117, 125, 0.2);
+}
+
+/* For icons inside buttons */
+.action-btn i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.action-btn i:not(.icon-only) {
+    margin-right: 8px;
+}
+
+.action-btn .icon-only {
+    margin: 0;
+}
+
+.icon-only-btn {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    padding: 0;
+}
