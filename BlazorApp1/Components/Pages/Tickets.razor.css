@@ -120,6 +120,14 @@
 .filter-chip.active-filter {
     border-color: #0078d4;
 }
+.filter-chip.active span {
+    margin-left: 4px;
+    color: rgb(223, 223, 223);
+}
+.filter-chip span {
+    margin-left: 4px;
+    color: #858585;
+}
 
 /* Category dropdown */
 .category-dropdown {
@@ -168,6 +176,10 @@
     background-color: #e9ecef;
     color: #0d6efd;
     font-weight: 500;
+}
+
+.chevron i {
+    margin-left: 8px;
 }
 
 /* Tickets list */
@@ -233,4 +245,32 @@
     width: 100%;
     justify-content: center;
     padding: 0 8px;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+    padding: 16px;
+}
+
+.empty-state h2 {
+    font-size: 24px;
+    color: #495057;
+    margin-bottom: 8px;
+}
+
+.empty-state p {
+    font-size: 16px;
+    color: #6c757d;
+    margin-bottom: 16px;
+}
+
+.empty-state i {
+    font-size: 48px;
+    color: #adb5bd;
+    margin-bottom: 16px;
 }
