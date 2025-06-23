@@ -1,4 +1,7 @@
 @inject NavigationManager Navigation
+@inject IEquipmentService EquipmentService
+@using BlazorApp1.Models
+@using BlazorApp1.Services
 @rendermode InteractiveServer
 
 <CascadingValue Value="Model">
@@ -73,9 +76,21 @@
     }
     private void CreateTicket()
     {
-        // Logic to create the ticket
-        // For example, you might call a service to save the ticket data
-        // After creating the ticket, navigate to the tickets list or show a success message
+        // Create new ticket with the wizard data
+        var newTicket = new Ticket
+        {
+            Category = Model.Category ?? "Uncategorized",
+            Header = Model.Header ?? "New Ticket",
+            Details = Model.Details ?? "",
+            EquipmentNumber = Model.EquipmentNumber,
+            Date = DateTime.Now,
+            Status = TicketStatus.Open
+        };
+
+        // Use your TicketService to create the ticket
+        // await TicketService.CreateTicketAsync(newTicket);
+        
+        // Navigate back to the tickets list
         Navigation.NavigateTo("/tickets");
     }
 }

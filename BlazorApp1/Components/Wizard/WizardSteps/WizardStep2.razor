@@ -1,33 +1,240 @@
 @rendermode InteractiveServer
-@inherits LayoutComponentBase
-
+@inject IEquipmentService EquipmentService
+@using BlazorApp1.Models
+@using BlazorApp1.Services
 
 <div class="wizard-step-container">
     <div class="wizard-content">
         <div class="mx-2">
             <h3>Velg utstyr</h3>
             <p>Søk opp og velg ønsket utstyr.</p>
-            <div class="search-header">
-                <div class="search-bar">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" placeholder="Søk etter utstyr">
+            
+            @if (selectedEquipment == null)
+            {
+                <div class="search-header mb-3">
+                    <div class="search-bar">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="text" placeholder="Søk etter utstyr" 
+                               @bind-value="searchTerm" 
+                               @bind-value:event="oninput" 
+                               @onkeyup="SearchEquipment" />
+                        @if (!string.IsNullOrEmpty(searchTerm))
+                        {
+                            <button class="clear-btn" @onclick="ClearSearch">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        }
+                    </div>
                 </div>
+            }
+            
+            <div class="equipment-search-container">
+                @if (isSearching)
+                {
+                    <div class="search-feedback text-center p-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Søker...</span>
+                        </div>
+                        <p class="mt-2">Søker etter utstyr...</p>
+                    </div>
+                }
+                else if (searchResults.Any() && !string.IsNullOrEmpty(searchTerm) && selectedEquipment == null)
+                {
+                    <div class="equipment-list">
+                        @foreach (var equipment in searchResults)
+                        {
+                            <div class="equipment-item" 
+                                 @onclick="() => SelectEquipment(equipment.EquipmentNumber)">
+                                <div class="equipment-content">
+                                    <div class="equipment-icon">
+                                        <i class="bi bi-hdd"></i>
+                                    </div>
+                                    <div class="equipment-info">
+                                        <div class="equipment-primary">
+                                            <div class="equipment-name">@equipment.DeviceType</div>
+                                            <div class="equipment-brand">@equipment.Brand</div>
+                                        </div>
+                                        <div class="equipment-secondary">
+                                            <div class="equipment-model">
+                                                <i class="bi bi-tag-fill me-1"></i>@equipment.Model
+                                            </div>
+                                            <div class="equipment-serial">
+                                                <i class="bi bi-upc me-1"></i>@equipment.SerialNumber
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else if (!string.IsNullOrEmpty(searchTerm) && selectedEquipment == null)
+                {
+                    <div class="empty-results">
+                        <i class="bi bi-search large-icon"></i>
+                        <p class="empty-title">Ingen utstyr funnet</p>
+                        <p class="empty-message">Prøv andre søkeord</p>
+                        <button class="btn btn-outline-secondary mt-2" @onclick="ClearSearch">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i>Tøm søk
+                        </button>
+                    </div>
+                }
+                else if (selectedEquipment == null)
+                {
+                    <div class="initial-state">
+                        <i class="bi bi-tools large-icon"></i>
+                        <p class="empty-title">Søk etter utstyr</p>
+                        <p class="empty-message">Skriv i søkefeltet for å finne utstyr</p>
+                    </div>
+                }
             </div>
-        </div>
-        <div class="equipment-list">
 
+            @if (selectedEquipment != null)
+            {
+                <div class="selected-equipment-info mt-4">
+                    <div class="equipment-card">
+                        <div class="equipment-header">
+                            <h5>@selectedEquipment.DeviceType</h5>
+                            <button class="btn btn-sm btn-outline-danger" @onclick="RemoveSelectedEquipment">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                        <div class="equipment-details">
+                            <div class="equipment-detail-item">
+                                <span class="label">Merke:</span>
+                                <span class="value">@selectedEquipment.Brand</span>
+                            </div>
+                            <div class="equipment-detail-item">
+                                <span class="label">Modell:</span>
+                                <span class="value">@selectedEquipment.Model</span>
+                            </div>
+                            <div class="equipment-detail-item">
+                                <span class="label">Serienummer:</span>
+                                <span class="value">@selectedEquipment.SerialNumber</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    <div class="switches-section mt-4">
+                        <h5 class="mb-3">Tilleggsvalg</h5>
+                        
+                        <div class="custom-switch-container mb-3">
+                            <label class="custom-switch-label" for="isContaminated">
+                                Utstyret er forurenset
+                            </label>
+                            <div class="custom-switch-input">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="isContaminated" @bind="Model.isContaminated">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="custom-switch-container">
+                            <label class="custom-switch-label" for="isCleaned">
+                                Er apparatet rengjort?
+                            </label>
+                            <div class="custom-switch-input">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="isCleaned" @bind="Model.isCleaned">
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
         </div>
     </div>
 </div>
 
 @code {
     [CascadingParameter]
-    public WizardModel Model { get; set; }
+    public WizardModel Model { get; set; } = default!;
 
-    private async Task SelectEquipment(string equipment)
+    [Parameter]
+    public EventCallback OnEquipmentSelected { get; set; }
+
+    private string searchTerm = "";
+    private bool isSearching = false;
+    private List<Equipment> searchResults = new();
+    private int? selectedEquipmentNumber;
+    private Equipment? selectedEquipment;
+    
+    protected override async Task OnInitializedAsync()
     {
-        Model.Equipment = equipment;
-        // Notify parent component that equipment has been selected
+        // If model already has equipment info stored, try to get it
+        if (Model.EquipmentNumber.HasValue)
+        {
+            var equipment = await EquipmentService.GetEquipmentByIdAsync(Model.EquipmentNumber.Value);
+            if (equipment != null)
+            {
+                selectedEquipment = equipment;
+                selectedEquipmentNumber = equipment.EquipmentNumber;
+            }
+        }
         
+        // Only perform initial search if no equipment is selected
+        if (selectedEquipment == null)
+        {
+            // Do not auto-search at beginning - wait for user input
+            // await SearchEquipment();
+        }
+    }
+
+    private async Task SearchEquipment()
+    {
+        // Only search if we have a search term
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            searchResults.Clear();
+            return;
+        }
+        
+        isSearching = true;
+        StateHasChanged();
+        
+        // Debounce search input
+        await Task.Delay(300);
+        
+        searchResults = await EquipmentService.SearchEquipmentAsync(searchTerm);
+        isSearching = false;
+    }
+
+    private void ClearSearch()
+    {
+        searchTerm = "";
+        searchResults.Clear();
+    }
+
+    private async Task SelectEquipment(int equipmentId)
+    {
+        selectedEquipmentNumber = equipmentId;
+        var equipment = await EquipmentService.GetEquipmentByIdAsync(equipmentId);
+        
+        if (equipment != null)
+        {
+            selectedEquipment = equipment;
+            Model.EquipmentNumber = equipment.EquipmentNumber;
+            
+            // We can store a description in the existing Equipment property
+            Model.Equipment = $"{equipment.DeviceType} {equipment.Brand} {equipment.Model}";
+            
+            // Clear the search
+            searchTerm = "";
+            searchResults.Clear();
+            
+            // Optional: notify parent component that equipment was selected
+            // await OnEquipmentSelected.InvokeAsync();
+        }
+    }
+
+    private async Task RemoveSelectedEquipment()
+    {
+        selectedEquipmentNumber = null;
+        selectedEquipment = null;
+        Model.EquipmentNumber = null;
+        Model.Equipment = null;
     }
 }

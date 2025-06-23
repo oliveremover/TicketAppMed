@@ -273,7 +273,7 @@
                                     <div class="equipment-search-results">
                                         @foreach (var equipment in equipmentSearchResults)
                                         {
-                                            <div class="equipment-result-item @(selectedEquipmentId == equipment.EquipmentNumber ? "selected" : "")" 
+                                            <div class="equipment-result-item @(selectedEquipmentNumber == equipment.EquipmentNumber ? "selected" : "")" 
                                                  @onclick="() => SelectEquipment(equipment.EquipmentNumber)">
                                                 <div class="equipment-item-inner">
                                                     <div class="equipment-icon">
@@ -293,7 +293,7 @@
                                                             </span>
                                                         </div>
                                                     </div>
-                                                    @if (selectedEquipmentId == equipment.EquipmentNumber)
+                                                    @if (selectedEquipmentNumber == equipment.EquipmentNumber)
                                                     {
                                                         <div class="selected-indicator">
                                                             <i class="bi bi-check-circle-fill"></i>
@@ -326,7 +326,7 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <div class="footer-hint @(selectedEquipmentId == null ? "" : "d-none")">
+                            <div class="footer-hint @(selectedEquipmentNumber == null ? "" : "d-none")">
                                 <i class="bi bi-info-circle me-1"></i>
                                 <span>Select an equipment item to continue</span>
                             </div>
@@ -337,7 +337,7 @@
                                 <button type="button" 
                                         class="btn btn-primary btn-assign" 
                                         @onclick="AssignSelectedEquipment"
-                                        disabled="@(selectedEquipmentId == null)">
+                                        disabled="@(selectedEquipmentNumber == null)">
                                     <i class="bi bi-link me-1"></i>Assign Equipment
                                 </button>
                             </div>
@@ -383,7 +383,7 @@
     private bool showEquipmentModal = false;
     private string equipmentSearchTerm = string.Empty;
     private List<Equipment> equipmentSearchResults = new();
-    private int? selectedEquipmentId = null;
+    private int? selectedEquipmentNumber = null;
     private bool isSearching = false;
     private ElementReference searchInput;
 
@@ -391,9 +391,9 @@
     {
         ticket = await TicketService.GetTicketByIdAsync(Id);
         // If ticket has an equipment ID but the equipment object is null, load it
-        if (ticket?.EquipmentId != null && ticket?.Equipment == null)
+        if (ticket?.EquipmentNumber != null && ticket?.Equipment == null)
         {
-            ticket.Equipment = await EquipmentService.GetEquipmentByIdAsync(ticket.EquipmentId.Value);
+            ticket.Equipment = await EquipmentService.GetEquipmentByIdAsync(ticket.EquipmentNumber.Value);
         }
     }
 
@@ -517,7 +517,7 @@
     private void OpenEquipmentModal()
     {
         showEquipmentModal = true;
-        selectedEquipmentId = null;
+        selectedEquipmentNumber = null;
         equipmentSearchTerm = string.Empty;
         equipmentSearchResults = new List<Equipment>();
         _ = SearchEquipment();
@@ -548,18 +548,18 @@
     
     private void SelectEquipment(int id)
     {
-        selectedEquipmentId = id;
+        selectedEquipmentNumber = id;
     }
     
     private async Task AssignSelectedEquipment()
     {
-        if (selectedEquipmentId == null || ticket == null) return;
+        if (selectedEquipmentNumber == null || ticket == null) return;
         
-        if (await TicketService.AssignEquipmentToTicketAsync(ticket.ID, selectedEquipmentId.Value))
+        if (await TicketService.AssignEquipmentToTicketAsync(ticket.ID, selectedEquipmentNumber.Value))
         {
             // Refresh the equipment data
-            var equipment = await EquipmentService.GetEquipmentByIdAsync(selectedEquipmentId.Value);
-            ticket.EquipmentId = selectedEquipmentId.Value;
+            var equipment = await EquipmentService.GetEquipmentByIdAsync(selectedEquipmentNumber.Value);
+            ticket.EquipmentNumber = selectedEquipmentNumber.Value;
             ticket.Equipment = equipment;
             
             CloseEquipmentModal();
@@ -572,7 +572,7 @@
         
         if (await TicketService.RemoveEquipmentFromTicketAsync(ticket.ID))
         {
-            ticket.EquipmentId = null;
+            ticket.EquipmentNumber = null;
             ticket.Equipment = null;
         }
     }

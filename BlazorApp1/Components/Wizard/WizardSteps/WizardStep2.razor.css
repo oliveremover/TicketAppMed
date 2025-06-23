@@ -2,10 +2,12 @@
     max-width: 500px;
     margin: 0 auto;
 }
+
 .wizard-content {
     padding: 0 8px;
     margin-top: 20px;
 }
+
 .wizard-content h3 {
     font-size: 18px;
     margin-bottom: 4px;
@@ -18,21 +20,22 @@
 
 /* Search header */
 .search-header {
-    border-bottom: 1px solid rgba(0,0,0,0.03);
+    margin-bottom: 16px;
 }
 
 .search-bar {
     position: relative;
     display: flex;
     align-items: center;
-    background-color: #ffffff;
+    background-color: #f8f9fa;
     border-radius: 8px;
-    padding: 0 12px;
+    padding: 0 16px;
+    border: 1px solid #dee2e6;
 }
 
 .search-icon {
     color: #6c757d;
-    margin-right: 8px;
+    margin-right: 12px;
 }
 
 .search-bar input {
@@ -57,4 +60,239 @@
     border: none;
     color: #6c757d;
     padding: 0;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* Equipment list */
+.equipment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.equipment-item {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    border: 1px solid #e9ecef;
+}
+
+.equipment-item:hover {
+    background-color: #f8f9fa;
+}
+
+.equipment-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+}
+
+.equipment-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background-color: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #0d6efd;
+    font-size: 18px;
+}
+
+.equipment-info {
+    flex: 1;
+}
+
+.equipment-primary {
+    display: flex;
+    flex-direction: column;
+}
+
+.equipment-name {
+    font-weight: 500;
+    color: #212529;
+    margin-bottom: 4px;
+}
+
+.equipment-brand {
+    font-size: 13px;
+    color: #6c757d;
+}
+
+.equipment-secondary {
+    display: flex;
+    gap: 16px;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #6c757d;
+}
+
+/* Empty states */
+.empty-results, .initial-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 16px;
+    text-align: center;
+}
+
+.large-icon {
+    font-size: 32px;
+    color: #adb5bd;
+    margin-bottom: 16px;
+}
+
+.empty-title {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.empty-message {
+    color: #6c757d;
+    margin-bottom: 8px;
+}
+
+/* Selected equipment card */
+.equipment-card {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 16px;
+    background-color: #f8f9fa;
+}
+
+.equipment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.equipment-header h5 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.equipment-details {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.equipment-detail-item {
+    display: flex;
+}
+
+.equipment-detail-item .label {
+    font-weight: 500;
+    width: 120px;
+    color: #6c757d;
+}
+
+.equipment-detail-item .value {
+    color: #212529;
+}
+
+.search-feedback {
+    text-align: center;
+    padding: 40px 0;
+    color: #6c757d;
+}
+
+/* Custom switch styles */
+.switches-section {
+    background-color: #f8f9fa;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    margin-top: 16px;
+}
+
+.switches-section h5 {
+    font-size: 16px;
+    color: #212529;
+    margin-bottom: 16px;
+}
+
+.custom-switch-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+}
+
+.custom-switch-label {
+    margin-bottom: 0;
+    flex-grow: 1;
+    padding-right: 12px;
+}
+
+.custom-switch-input {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+/* Toggle switch styling */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+input:checked + .toggle-slider {
+    background-color: #0d6efd;
+}
+
+input:focus + .toggle-slider {
+    box-shadow: 0 0 1px #0d6efd;
+}
+
+input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+.toggle-slider:active:before {
+    width: 24px;
 }

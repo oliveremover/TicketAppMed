@@ -160,7 +160,7 @@ namespace BlazorApp1.Services
             var equipment = await _equipmentService.GetEquipmentByIdAsync(equipmentId);
             if (equipment == null) return false;
             
-            ticket.EquipmentId = equipmentId;
+            ticket.EquipmentNumber = equipmentId;
             ticket.Equipment = equipment;
             
             return true;
@@ -174,7 +174,7 @@ namespace BlazorApp1.Services
             var ticket = _mockTickets.FirstOrDefault(t => t.ID == ticketId);
             if (ticket == null) return false;
             
-            ticket.EquipmentId = null;
+            ticket.EquipmentNumber = null;
             ticket.Equipment = null;
             
             return true;
