@@ -1,31 +1,39 @@
 @namespace BlazorApp1.Components.StatusBadge
 @using BlazorApp1.Models
 
-<div class="status-badge @GetStatusClass()">@GetStatusText()</div>
+<div class="status-badge @GetStatusClass()">
+    <i class="bi @GetStatusIcon() me-1"></i>
+    @GetStatusText()
+</div>
 
 @code {
     [Parameter]
-    public StatusTypes Status { get; set; }
+    public TicketStatus Status { get; set; } = TicketStatus.Open;
 
     private string GetStatusClass()
     {
         return Status switch
         {
-            StatusTypes.Open => "open",
-            StatusTypes.Pending => "pending",
-            StatusTypes.Resolved => "resolved",
-            _ => "open"
+            TicketStatus.Open => "status-open",
+            TicketStatus.Pending => "status-pending",
+            TicketStatus.Closed => "status-closed",
+            _ => "status-unknown"
+        };
+    }
+
+    private string GetStatusIcon()
+    {
+        return Status switch
+        {
+            TicketStatus.Open => "bi-exclamation-circle",
+            TicketStatus.Pending => "bi-hourglass-split",
+            TicketStatus.Closed => "bi-check-circle",
+            _ => "bi-question-circle"
         };
     }
 
     private string GetStatusText()
     {
-        return Status switch
-        {
-            StatusTypes.Open => "Open",
-            StatusTypes.Pending => "Pending",
-            StatusTypes.Resolved => "Resolved",
-            _ => "Open"
-        };
+        return Status.ToDisplayString();
     }
 }

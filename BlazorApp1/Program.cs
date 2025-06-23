@@ -1,4 +1,5 @@
 using BlazorApp1.Components;
+using BlazorApp1.Services;
 using Microsoft.AspNetCore.StaticFiles;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddScoped<ITicketService, TicketService>();
 
 var app = builder.Build();
 

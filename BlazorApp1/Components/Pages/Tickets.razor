@@ -2,7 +2,10 @@
 @rendermode InteractiveServer
 @inject IJSRuntime JSRuntime
 @inject NavigationManager Navigation
+@inject ITicketService TicketService
 @using BlazorApp1.Components.Ticket
+@using BlazorApp1.Models
+@using BlazorApp1.Services
 
 <PageTitle>Tickets</PageTitle>
 
@@ -117,7 +120,7 @@
                 <TicketComp Ticket="@ticket" OnTicketClick="NavigateToTicket" />
             }
             
-            @if (FilteredAndSortedTickets.Count() == 0)
+            @if (!FilteredAndSortedTickets.Any())
             {
                 <div class="empty-state">
                     <i class="fas fa-ticket-alt empty-icon"></i>
@@ -133,34 +136,65 @@
 </div>
 
 @code {
-    private TicketComp.TicketContainer[]? tickets;
+    private List<Ticket>? tickets;
     private string searchTerm = "";
     private string? selectedCategory = null;
-    private bool showMyTickets = true; // Changed from false to true
+    private bool showMyTickets = true;
     private bool showCategoryDropdown = false;
+    private const string CurrentUserId = "current.user@example.com"; // In a real app, get from authentication
     
     protected override async Task OnInitializedAsync()
     {
-        // Simulate asynchronous loading
-        await Task.Delay(500);
-
-        var startDate = DateTime.Now;
-        var categories = new[] { "Drammen", "Bærum", "Kongsberg", "Ringerike", "Feilmeld", "Mikrobiologen", "Martina Hansen", "Prioritering" };
-        tickets = Enumerable.Range(1, 10).Select(index => new TicketComp.TicketContainer
-        {
-            Date = startDate.AddDays(-index),
-            Category = categories[Random.Shared.Next(categories.Length)],
-            Header = $"Ticket {index}: {Lorem(4)}",
-            ID = index,
-            Details = Lorem(20),
-            Status = Random.Shared.Next(3) // 0: New, 1: In Progress, 2: Resolved
-        }).ToArray();
+        tickets = await TicketService.GetAllTicketsAsync();
     }
     
-    private string Lorem(int words)
+    private IEnumerable<Ticket> FilteredAndSortedTickets 
+    { 
+        get
+        {
+            if (tickets == null)
+                return Array.Empty<Ticket>();
+                
+            var filtered = tickets.AsEnumerable();
+            
+            // Filter by "My" tickets if selected
+            if (showMyTickets)
+            {
+                filtered = filtered.Where(t => t.CreatedBy == CurrentUserId || t.AssignedTo == CurrentUserId);
+            }
+            
+            // Apply category filter if selected
+            if (!string.IsNullOrEmpty(selectedCategory))
+            {
+                filtered = filtered.Where(t => t.Category == selectedCategory);
+            }
+            
+            // Apply search term if provided
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                filtered = filtered.Where(t => 
+                    (t.Header != null && t.Header.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) || 
+                    (t.Details != null && t.Details.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) || 
+                    (t.Category != null && t.Category.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) ||
+                    t.GetFormattedID().Contains(searchTerm, StringComparison.OrdinalIgnoreCase)
+                );
+            }
+            
+            // Order by date, newest first
+            return filtered.OrderByDescending(t => t.Date);
+        }
+    }
+
+    private int GetMyTicketsCount()
     {
-        var loremWords = "Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua".Split(' ');
-        return string.Join(" ", Enumerable.Range(0, words).Select(_ => loremWords[Random.Shared.Next(loremWords.Length)]));
+        if (tickets == null) return 0;
+            
+        return tickets.Count(t => t.CreatedBy == CurrentUserId || t.AssignedTo == CurrentUserId);
+    }
+
+    private int GetAllTicketsCount()
+    {
+        return tickets?.Count ?? 0;
     }
 
     private void ClearSearch()
@@ -171,20 +205,27 @@
     private void FilterByCategory(string? category)
     {
         selectedCategory = category;
-
-        showCategoryDropdown = false; // Close dropdown after selection
+        showCategoryDropdown = false;
     }
 
     private void FilterMyTickets(bool myTicketsOnly)
     {
         showMyTickets = myTicketsOnly;
-        // You would implement logic here to filter to only your tickets
-        // For example, you might filter by current user ID
     }
     
     private void ToggleCategoryDropdown()
     {
         showCategoryDropdown = !showCategoryDropdown;
+    }
+    
+    private void ClearCategoryFilter()
+    {
+        selectedCategory = null;
+    }
+    
+    private async Task NavigateToTicket(int id)
+    {
+        Navigation.NavigateTo($"/tickets/{id}");
     }
     
     // Close dropdown when clicking outside
@@ -209,69 +250,5 @@
     private IEnumerable<string> GetUniqueCategories()
     {
         return tickets?.Select(t => t.Category).Where(c => c != null).Distinct().Cast<string>() ?? Array.Empty<string>();
-    }
-
-    private async Task NavigateToTicket(int id)
-    {
-        Navigation.NavigateTo($"/tickets/{id}");
-    }
-
-    // Updated filtering and sorting logic
-    private IEnumerable<TicketComp.TicketContainer> FilteredAndSortedTickets 
-    { 
-        get
-        {
-            if (tickets == null)
-                return Array.Empty<TicketComp.TicketContainer>();
-                
-            var filtered = tickets.AsEnumerable();
-            
-            // Filter by "My" tickets if selected
-            if (showMyTickets)
-            {
-                // Replace this with your actual logic for determining "my" tickets
-                // For example: filtered = filtered.Where(t => t.AssignedTo == currentUserId);
-                filtered = filtered.Take(3); // Just for demonstration
-            }
-            
-            // Apply category filter if selected
-            if (!string.IsNullOrEmpty(selectedCategory))
-            {
-                filtered = filtered.Where(t => t.Category == selectedCategory);
-            }
-            
-            // Apply search term if provided
-            if (!string.IsNullOrWhiteSpace(searchTerm))
-            {
-                filtered = filtered.Where(t => 
-                    (t.Header != null && t.Header.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) || 
-                    (t.Details != null && t.Details.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)) || 
-                    (t.Category != null && t.Category.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
-                );
-            }
-            
-            // Order by date, newest first
-            return filtered.OrderByDescending(t => t.Date);
-        }
-    }
-
-    private int GetMyTicketsCount()
-    {
-        if (tickets == null)
-            return 0;
-            
-        // Replace this with your actual logic for determining "my" tickets
-        // For demo purposes, using the same logic as in FilteredAndSortedTickets
-        return tickets.Take(3).Count();
-    }
-
-    private int GetAllTicketsCount()
-    {
-        return tickets?.Length ?? 0;
-    }
-
-    private void ClearCategoryFilter()
-    {
-        selectedCategory = null;
     }
 }
