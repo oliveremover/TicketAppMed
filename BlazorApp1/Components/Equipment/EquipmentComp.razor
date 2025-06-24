@@ -1,0 +1,58 @@
+@using BlazorApp1.Models
+@rendermode InteractiveServer
+
+<div class="equipment-card">
+    <div class="equipment-header">
+        <h5>@Equipment.DeviceType</h5>
+        @if (AllowRemove)
+        {
+            <button class="btn btn-sm btn-outline-danger" @onclick="OnRemoveClicked">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        }
+        <a class="chevron-link" href="@($"/equipment/{Equipment.EquipmentNumber}")" title="View Details">
+            <i class="bi bi-chevron-right"></i>
+        </a>
+    </div>
+    <div class="equipment-details">
+        <div class="equipment-detail-item">
+            <span class="label">Equipment Number:</span>
+            <span class="value">@Equipment.EquipmentNumber</span>
+        </div>
+        <div class="equipment-detail-item">
+            <span class="label">Serial Number:</span>
+            <span class="value">@Equipment.SerialNumber</span>
+        </div>
+        <div class="equipment-detail-item">
+            <span class="label">Model:</span>
+            <span class="value">@Equipment.Model</span>
+        </div>
+        <div class="equipment-detail-item">
+            <span class="label">Brand:</span>
+            <span class="value">@Equipment.Brand</span>
+        </div>
+        @if (!string.IsNullOrEmpty(Equipment.AltID))
+        {
+            <div class="equipment-detail-item">
+                <span class="label">Alt ID:</span>
+                <span class="value">@Equipment.AltID</span>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public Equipment Equipment { get; set; } = default!;
+    
+    [Parameter]
+    public bool AllowRemove { get; set; } = true;
+    
+    [Parameter]
+    public EventCallback OnRemove { get; set; }
+    
+    private async Task OnRemoveClicked()
+    {
+        await OnRemove.InvokeAsync();
+    }
+}

@@ -7,6 +7,7 @@ namespace BlazorApp1.Models
         public string DeviceType { get; set; } = string.Empty;
         public string Model { get; set; } = string.Empty;
         public string SerialNumber { get; set; } = string.Empty;
-        
+        public string AltID { get; set; } = string.Empty;
+        public string Code { get; set; } = string.Empty;
     }
 }

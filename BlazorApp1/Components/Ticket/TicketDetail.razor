@@ -5,6 +5,7 @@
 @inject ITicketService TicketService
 @inject IEquipmentService EquipmentService
 @using BlazorApp1.Components.StatusBadge
+@using BlazorApp1.Components.Equipment
 @using BlazorApp1.Models
 @using BlazorApp1.Services
 
@@ -60,28 +61,7 @@
                 <div class="content-body">
                     @if (ticket.Equipment != null)
                     {
-                        <div class="equipment-card">
-                            <div class="equipment-header">
-                                <h5>@ticket.Equipment.DeviceType</h5>
-                                <button class="btn btn-sm btn-outline-danger" @onclick="RemoveEquipment">
-                                    <i class="bi bi-x-lg"></i>
-                                </button>
-                            </div>
-                            <div class="equipment-details">
-                                <div class="equipment-detail-item">
-                                    <span class="label">Serial Number:</span>
-                                    <span class="value">@ticket.Equipment.SerialNumber</span>
-                                </div>
-                                <div class="equipment-detail-item">
-                                    <span class="label">Model:</span>
-                                    <span class="value">@ticket.Equipment.Model</span>
-                                </div>
-                                <div class="equipment-detail-item">
-                                    <span class="label">Brand:</span>
-                                    <span class="value">@ticket.Equipment.Brand</span>
-                                </div>
-                            </div>
-                        </div>
+                        <EquipmentComp Equipment="ticket.Equipment" OnRemove="RemoveEquipment" />
                     }
                     else
                     {

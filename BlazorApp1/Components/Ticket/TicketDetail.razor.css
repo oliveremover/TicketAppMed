@@ -99,44 +99,6 @@
     font-size: 14px;
 }
 
-/* Equipment card styles */
-.equipment-card {
-    background-color: #f8f9fa;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-}
-
-.equipment-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
-.equipment-header h5 {
-    margin: 0;
-    font-size: 15px;
-    font-weight: 600;
-}
-
-.equipment-details {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    font-size: 13px;
-}
-
-.equipment-detail-item {
-    display: flex;
-}
-
-.equipment-detail-item .label {
-    font-weight: 500;
-    width: 100px;
-    color: #6c757d;
-}
-
 /* Comment styles */
 .comments-list {
     display: flex;

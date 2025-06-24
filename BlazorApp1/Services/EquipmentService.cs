@@ -12,21 +12,21 @@ namespace BlazorApp1.Services
         Task<Equipment?> GetEquipmentByIdAsync(int id);
         Task<List<Equipment>> SearchEquipmentAsync(string searchTerm);
     }
-    
+
     public class EquipmentService : IEquipmentService
     {
         private static List<Equipment> _mockEquipment = new();
         private static bool _initialized = false;
-        
+
         private void InitializeMockData()
         {
             if (_initialized) return;
-            
+
             // Create sample equipment data
             var random = new Random();
             var equipmentTypes = new[] { "Computer", "Printer", "Scanner", "Server", "Monitor", "Microscope", "Analyzer" };
             var locations = new[] { "Drammen", "Bærum", "Kongsberg", "Ringerike", "Mikrobiologen" };
-            
+
             _mockEquipment = Enumerable.Range(1, 20).Select(i => new Equipment
             {
                 EquipmentNumber = i,
@@ -35,39 +35,47 @@ namespace BlazorApp1.Services
                 Brand = equipmentTypes[random.Next(equipmentTypes.Length)],
                 DeviceType = equipmentTypes[random.Next(equipmentTypes.Length)],
             }).ToList();
-            
+
             _initialized = true;
         }
-        
+
         public async Task<List<Equipment>> GetAllEquipmentAsync()
         {
             InitializeMockData();
             await Task.Delay(300); // Simulate network delay
-            
+
             return _mockEquipment.ToList();
         }
-        
+
         public async Task<Equipment?> GetEquipmentByIdAsync(int id)
         {
             InitializeMockData();
             await Task.Delay(200); // Simulate network delay
-            
+
             return _mockEquipment.FirstOrDefault(e => e.EquipmentNumber == id);
         }
-        
+
         public async Task<List<Equipment>> SearchEquipmentAsync(string searchTerm)
         {
             InitializeMockData();
             await Task.Delay(300); // Simulate network delay
-            
+
             if (string.IsNullOrWhiteSpace(searchTerm))
                 return _mockEquipment.Take(5).ToList();
-                
+
             return _mockEquipment
-                .Where(e => e.Brand.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || 
-                            e.SerialNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) || 
+                .Where(e => e.Brand.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                            e.SerialNumber.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
                             e.Model.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
                 .ToList();
+        }
+
+        public async Task<Equipment?> GetEquipmentByNumberAsync(int equipmentNumber)
+        {
+            InitializeMockData();
+            await Task.Delay(200); // Simulate network delay
+
+            return _mockEquipment.FirstOrDefault(e => e.EquipmentNumber == equipmentNumber);
         }
     }
 }
