@@ -82,9 +82,9 @@
 
 /* Section styles */
 .content-section {
-    margin-bottom: 24px;
+    margin-bottom: 16px; /* reduced from 24px */
     border-top: 1px solid #e9ecef;
-    padding-top: 16px;
+    padding-top: 12px; /* reduced from 16px */
 }
 
 .section-title {
@@ -312,17 +312,24 @@
     display: none;
 }
 
-/* Empty state styling */
-.empty-state {
-    padding: 32px 16px;
-    text-align: center;
+/* Compact empty state styling */
+.compact-empty-state {
+    display: flex;
+    align-items: center;
     color: #6c757d;
+    padding: 4px 0;
+    min-height: 40px;
 }
 
-.empty-state .large-icon {
-    font-size: 32px;
-    margin-bottom: 8px;
-    color: #adb5bd;
+.compact-empty-state button {
+    color: #0d6efd;
+    padding: 4px 8px;
+    font-size: 14px;
+}
+
+.compact-empty-state button:hover {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-radius: 4px;
 }
 
 /* Modal adjustments */
@@ -353,6 +360,64 @@
 
 .button-group button {
     width: 100%;
+}
+
+/* Mobile-friendly modal improvements */
+@media (max-width: 576px) {
+  .mobile-modal-content {
+    max-height: 95vh;
+    margin: 10px;
+    border-radius: 12px;
+  }
+  
+  .modal-dialog-scrollable .modal-body {
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+  
+  .results-container {
+    min-height: 200px;
+    max-height: 50vh;
+    overflow-y: auto;
+  }
+  
+  .equipment-search-results {
+    margin-bottom: 10px;
+  }
+}
+
+/* Make search input more compact on mobile */
+@media (max-width: 576px) {
+  .input-group {
+    height: 40px;
+  }
+  
+  .form-control,
+  .input-group-text,
+  .btn-outline-secondary {
+    font-size: 0.9rem;
+    padding: 0.25rem 0.5rem;
+  }
+  
+  .large-icon {
+    font-size: 2rem !important;
+    margin-bottom: 0.5rem;
+  }
+  
+  .empty-title {
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+  }
+  
+  .empty-message {
+    font-size: 0.875rem;
+  }
+}
+
+/* Button improvements for mobile */
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
 }
 
 @media (min-width: 768px) {
@@ -399,5 +464,103 @@
     
     .button-group button {
         width: auto;
+    }
+}
+
+/* Equipment search results styling */
+.equipment-search-results {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.equipment-result-item {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.equipment-result-item:hover {
+    border-color: #c6c9cc;
+    background-color: #f8f9fa;
+}
+
+.equipment-result-item.selected {
+    border: 2px solid #0d6efd;
+    background-color: #f0f7ff;
+}
+
+.equipment-item-inner {
+    display: flex;
+    padding: 12px;
+    gap: 12px;
+    align-items: center;
+    position: relative;
+}
+
+.equipment-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.equipment-primary {
+    font-weight: 500;
+    font-size: 15px;
+    margin-bottom: 4px;
+    color: #212529;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.equipment-secondary {
+    font-size: 13px;
+    color: #6c757d;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.equipment-secondary span::after {
+    content: "•";
+    display: inline-block;
+    margin-left: 8px;
+    color: #adb5bd;
+}
+
+.equipment-secondary span:last-child::after {
+    content: none;
+}
+
+.selected-indicator {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: #0d6efd;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+}
+
+/* Mobile optimizations for equipment list */
+@media (max-width: 576px) {
+    .equipment-item-inner {
+        padding: 10px;
+    }
+    
+    .equipment-primary {
+        font-size: 14px;
+    }
+    
+    .equipment-secondary {
+        font-size: 12px;
     }
 }

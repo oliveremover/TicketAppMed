@@ -53,7 +53,7 @@
                 </div>
             </div>
             
-            <!-- Equipment section -->
+            <!-- Equipment section with compact empty state -->
             <div class="content-section">
                 <h4 class="section-title">
                     <i class="bi bi-tools me-2"></i>Equipment
@@ -65,11 +65,9 @@
                     }
                     else
                     {
-                        <div class="empty-state">
-                            <i class="bi bi-tools large-icon"></i>
-                            <p>No equipment associated with this ticket</p>
-                            <button class="btn btn-sm btn-outline-primary" @onclick="OpenEquipmentModal">
-                                <i class="bi bi-plus-lg me-1"></i>Add equipment
+                        <div class="compact-empty-state">
+                            <button class="btn btn-sm btn-link text-decoration-none" @onclick="OpenEquipmentModal">
+                                <i class="bi bi-plus-circle me-1"></i>Add equipment
                             </button>
                         </div>
                     }
@@ -86,7 +84,7 @@
                 </div>
             </div>
             
-            <!-- Attachments section -->
+            <!-- Attachments section with compact empty state -->
             <div class="content-section">
                 <h4 class="section-title">
                     <i class="bi bi-paperclip me-2"></i>Attachments
@@ -107,11 +105,9 @@
                     }
                     else
                     {
-                        <div class="empty-state">
-                            <i class="bi bi-files large-icon"></i>
-                            <p>No attachments yet</p>
-                            <button class="btn btn-sm btn-outline-primary">
-                                <i class="bi bi-plus-lg me-1"></i>Add attachment
+                        <div class="compact-empty-state">
+                            <button class="btn btn-sm btn-link text-decoration-none">
+                                <i class="bi bi-plus-circle me-1"></i>Add attachment
                             </button>
                         </div>
                     }
@@ -213,28 +209,28 @@
             }
         </div>
 
-        <!-- Equipment selection modal -->
+        <!-- Equipment selection modal with improved mobile layout -->
         @if (showEquipmentModal)
         {
             <div class="modal-backdrop show"></div>
             <div class="modal d-block" tabindex="-1" role="dialog">
-                <div class="modal-dialog modal-fullscreen-sm-down modal-dialog-centered modal-lg">
-                    <div class="modal-content">
-                        <div class="modal-header">
+                <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-lg">
+                    <div class="modal-content mobile-modal-content">
+                        <div class="modal-header py-2">
                             <h5 class="modal-title">
                                 <i class="bi bi-tools me-2"></i>Select Equipment
                             </h5>
                             <button type="button" class="btn-close" @onclick="CloseEquipmentModal" aria-label="Close"></button>
                         </div>
-                        <div class="modal-body">
-                            <div class="search-container mb-4">
+                        <div class="modal-body p-2 p-sm-3">
+                            <div class="search-container mb-2 mb-sm-3">
                                 <label for="equipmentSearch" class="form-label visually-hidden">Search equipment</label>
-                                <div class="input-group input-group-lg">
+                                <div class="input-group">
                                     <span class="input-group-text bg-light border-end-0">
                                         <i class="bi bi-search text-muted"></i>
                                     </span>
                                     <input type="text" 
-                                           class="form-control form-control-lg border-start-0" 
+                                           class="form-control border-start-0" 
                                            id="equipmentSearch"
                                            placeholder="Search by name, serial number, or model..." 
                                            @bind-value="equipmentSearchTerm" 
@@ -256,43 +252,36 @@
                             <div class="results-container">
                                 @if (isSearching)
                                 {
-                                    <div class="search-feedback text-center p-4">
-                                        <div class="spinner-grow text-primary mb-2" role="status">
+                                    <div class="search-feedback text-center p-3">
+                                        <div class="spinner-border text-primary mb-2" role="status">
                                             <span class="visually-hidden">Loading...</span>
                                         </div>
-                                        <p class="text-muted">Searching equipment...</p>
+                                        <p class="text-muted mb-0">Searching equipment...</p>
                                     </div>
                                 }
                                 else if (equipmentSearchResults.Any())
                                 {
-                                    <p class="results-count mb-3">Found @equipmentSearchResults.Count equipment items</p>
+                                    <p class="results-count small mb-2">Found @equipmentSearchResults.Count equipment items</p>
                                     <div class="equipment-search-results">
                                         @foreach (var equipment in equipmentSearchResults)
                                         {
                                             <div class="equipment-result-item @(selectedEquipmentNumber == equipment.EquipmentNumber ? "selected" : "")" 
                                                  @onclick="() => SelectEquipment(equipment.EquipmentNumber)">
                                                 <div class="equipment-item-inner">
-                                                    <div class="equipment-icon">
-                                                        <i class="bi bi-hdd"></i>
-                                                    </div>
                                                     <div class="equipment-info">
                                                         <div class="equipment-primary">
-                                                            <span class="equipment-name">@equipment.DeviceType</span>
-                                                            <span class="equipment-brand">@equipment.Brand</span>
+                                                            @equipment.DeviceType @equipment.Brand
                                                         </div>
                                                         <div class="equipment-secondary">
-                                                            <span class="equipment-model">
-                                                                <i class="bi bi-tag-fill me-1"></i>@equipment.Model
-                                                            </span>
-                                                            <span class="equipment-serial">
-                                                                <i class="bi bi-upc me-1"></i>@equipment.SerialNumber
-                                                            </span>
+                                                            <span>@(equipment.EquipmentNumber)</span>
+                                                            <span>@equipment.Model</span>
+                                                            <span>@equipment.SerialNumber</span>
                                                         </div>
                                                     </div>
                                                     @if (selectedEquipmentNumber == equipment.EquipmentNumber)
                                                     {
                                                         <div class="selected-indicator">
-                                                            <i class="bi bi-check-circle-fill"></i>
+                                                            <i class="bi bi-check"></i>
                                                         </div>
                                                     }
                                                 </div>
@@ -302,7 +291,7 @@
                                 }
                                 else if (!string.IsNullOrEmpty(equipmentSearchTerm))
                                 {
-                                    <div class="empty-search-results">
+                                    <div class="empty-search-results p-3">
                                         <i class="bi bi-search large-icon"></i>
                                         <p class="empty-title">No matching equipment found</p>
                                         <p class="empty-message text-muted">Try different keywords or check the spelling</p>
@@ -313,7 +302,7 @@
                                 }
                                 else
                                 {
-                                    <div class="initial-state">
+                                    <div class="initial-state p-3">
                                         <i class="bi bi-tools large-icon"></i>
                                         <p class="empty-title">Search for equipment</p>
                                         <p class="empty-message text-muted">Type in the search box above to find equipment</p>
@@ -321,20 +310,20 @@
                                 }
                             </div>
                         </div>
-                        <div class="modal-footer">
-                            <div class="footer-hint @(selectedEquipmentNumber == null ? "" : "d-none")">
+                        <div class="modal-footer py-2">
+                            <div class="footer-hint small @(selectedEquipmentNumber == null ? "" : "d-none")">
                                 <i class="bi bi-info-circle me-1"></i>
                                 <span>Select an equipment item to continue</span>
                             </div>
                             <div class="button-group">
-                                <button type="button" class="btn btn-outline-secondary" @onclick="CloseEquipmentModal">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" @onclick="CloseEquipmentModal">
                                     <i class="bi bi-x me-1"></i>Cancel
                                 </button>
                                 <button type="button" 
-                                        class="btn btn-primary btn-assign" 
+                                        class="btn btn-sm btn-primary btn-assign" 
                                         @onclick="AssignSelectedEquipment"
                                         disabled="@(selectedEquipmentNumber == null)">
-                                    <i class="bi bi-link me-1"></i>Assign Equipment
+                                    <i class="bi bi-link me-1"></i>Assign
                                 </button>
                             </div>
                         </div>
