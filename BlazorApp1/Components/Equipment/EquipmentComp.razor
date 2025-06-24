@@ -3,24 +3,27 @@
 
 <div class="equipment-card">
     <div class="equipment-header">
-        <h5>@Equipment.DeviceType</h5>
-        @if (AllowRemove)
-        {
-            <button class="btn btn-sm btn-outline-danger" @onclick="OnRemoveClicked">
-                <i class="bi bi-x-lg"></i>
-            </button>
-        }
-        <a class="chevron-link" href="@($"/equipment/{Equipment.EquipmentNumber}")" title="View Details">
-            <i class="bi bi-chevron-right"></i>
-        </a>
+        <h5 class="device-type">@Equipment.DeviceType</h5>
+        <div class="action-buttons">
+            @if (AllowRemove)
+            {
+                <button class="btn btn-sm btn-outline-danger remove-btn" @onclick="ShowRemoveConfirmation" aria-label="Remove equipment">
+                    <i class="bi bi-trash"></i>
+                </button>
+            }
+            <a class="btn btn-sm btn-outline-primary details-btn" href="@($"/equipment/{Equipment.EquipmentNumber}")" title="View Details" aria-label="View equipment details">
+                <span class="d-none d-md-inline">Details</span>
+                <i class="bi bi-chevron-right"></i>
+            </a>
+        </div>
     </div>
     <div class="equipment-details">
         <div class="equipment-detail-item">
-            <span class="label">Equipment Number:</span>
+            <span class="label">Equipment #:</span>
             <span class="value">@Equipment.EquipmentNumber</span>
         </div>
         <div class="equipment-detail-item">
-            <span class="label">Serial Number:</span>
+            <span class="label">Serial #:</span>
             <span class="value">@Equipment.SerialNumber</span>
         </div>
         <div class="equipment-detail-item">
@@ -41,6 +44,29 @@
     </div>
 </div>
 
+@if (showRemoveConfirmation)
+{
+    <div class="modal-backdrop show"></div>
+    <div class="modal d-block" tabindex="-1" role="dialog">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Removal</h5>
+                    <button type="button" class="btn-close" @onclick="CancelRemove" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to remove this equipment?</p>
+                    <p class="fw-bold">@Equipment.DeviceType (ID: @Equipment.EquipmentNumber)</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CancelRemove">Cancel</button>
+                    <button type="button" class="btn btn-danger" @onclick="ConfirmRemove">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
 @code {
     [Parameter]
     public Equipment Equipment { get; set; } = default!;
@@ -51,8 +77,21 @@
     [Parameter]
     public EventCallback OnRemove { get; set; }
     
-    private async Task OnRemoveClicked()
+    private bool showRemoveConfirmation = false;
+
+    private void ShowRemoveConfirmation()
     {
+        showRemoveConfirmation = true;
+    }
+
+    private void CancelRemove()
+    {
+        showRemoveConfirmation = false;
+    }
+    
+    private async Task ConfirmRemove()
+    {
+        showRemoveConfirmation = false;
         await OnRemove.InvokeAsync();
     }
 }
