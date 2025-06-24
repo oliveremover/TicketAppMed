@@ -445,33 +445,54 @@
     
     private async Task AddComment()
     {
-        if (string.IsNullOrWhiteSpace(newComment) || ticket == null)
-            return;
-            
-        var comment = new Comment
+        try
         {
-            ID = ticket.Comments.Count > 0 ? ticket.Comments.Max(c => c.ID) + 1 : 1,
-            Text = newComment.Trim(),
-            Date = DateTime.Now,
-            Author = "current.user@example.com"  // In a real app, get from authentication
-        };
-        
-        ticket.Comments.Add(comment);
-        
-        // In a real app, you would save this to the backend
-        await TicketService.UpdateTicketAsync(ticket);
-        
-        // Clear the input
-        newComment = string.Empty;
-        
-        // Scroll to the new comment (optional)
-        await JSRuntime.InvokeVoidAsync("scrollToElementById", "comment-" + comment.ID);
-        
-        // Reset the textarea height
-        await JSRuntime.InvokeVoidAsync("autoResizeTextarea", commentTextArea);
-        
-        // Reset focus state
-        isCommentFocused = false;
+            if (string.IsNullOrWhiteSpace(newComment) || ticket == null)
+                return;
+                
+            var comment = new Comment
+            {
+                ID = ticket.Comments?.Count > 0 ? ticket.Comments.Max(c => c.ID) + 1 : 1,
+                Text = newComment.Trim(),
+                Date = DateTime.Now,
+                Author = "current.user@example.com"  // In a real app, get from authentication
+            };
+            
+            // Initialize Comments collection if it's null
+            if (ticket.Comments == null)
+                ticket.Comments = new List<Comment>();
+                
+            ticket.Comments.Add(comment);
+            
+            // In a real app, you would save this to the backend
+            await TicketService.UpdateTicketAsync(ticket);
+            
+            // Clear the input
+            newComment = string.Empty;
+            
+            // Reset focus state first before interacting with JS
+            isCommentFocused = false;
+            
+            // Force a UI update
+            StateHasChanged();
+            
+            // Scroll to the new comment (wrapped in try-catch in case JS interop fails)
+            try 
+            {
+                await JSRuntime.InvokeVoidAsync("scrollToElementById", "comment-" + comment.ID);
+                await JSRuntime.InvokeVoidAsync("autoResizeTextarea", commentTextArea);
+            }
+            catch (Exception jsEx)
+            {
+                Console.WriteLine($"JS interop error: {jsEx.Message}");
+                // Continue execution even if JS functions fail
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error adding comment: {ex.Message}");
+            // Log the error or show a user-friendly message
+        }
     }
     
     private string GetRelativeTime(DateTime date)

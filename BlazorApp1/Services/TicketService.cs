@@ -103,16 +103,24 @@ namespace BlazorApp1.Services
         
         public async Task<bool> UpdateTicketAsync(Ticket ticket)
         {
-            InitializeMockData();
-            await Task.Delay(500); // Simulate network delay
-            
-            var existingTicket = _mockTickets.FirstOrDefault(t => t.ID == ticket.ID);
-            if (existingTicket == null) return false;
-            
-            var index = _mockTickets.IndexOf(existingTicket);
-            _mockTickets[index] = ticket;
-            
-            return true;
+            try
+            {
+                InitializeMockData();
+                await Task.Delay(500); // Simulate network delay
+                
+                var existingTicket = _mockTickets.FirstOrDefault(t => t.ID == ticket.ID);
+                if (existingTicket == null) return false;
+                
+                var index = _mockTickets.IndexOf(existingTicket);
+                _mockTickets[index] = ticket;
+                
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating ticket: {ex.Message}");
+                return false;
+            }
         }
         
         public async Task<bool> DeleteTicketAsync(int id)
