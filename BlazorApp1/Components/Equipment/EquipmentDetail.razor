@@ -138,30 +138,30 @@
                 if (returnUrl.StartsWith("ticket/") || returnUrl.StartsWith("tickets/"))
                 {
                     // Navigate to the ticket
-                    NavigationManager.NavigateTo("/" + returnUrl);
+                    NavigationManager.NavigateTo("/" + returnUrl, forceLoad: false);
                 }
                 else if (int.TryParse(returnUrl, out int ticketId))
                 {
                     // If returnUrl is just a number, assume it's a ticket ID
-                    NavigationManager.NavigateTo($"/tickets/{ticketId}");
+                    NavigationManager.NavigateTo($"/tickets/{ticketId}", forceLoad: false);
                 }
                 else
                 {
                     // Otherwise, just try to navigate to the provided URL
-                    NavigationManager.NavigateTo(returnUrl);
+                    NavigationManager.NavigateTo(returnUrl, forceLoad: false);
                 }
             }
             else
             {
                 // If no returnUrl is specified, go back to the equipment list or tickets page
-                NavigationManager.NavigateTo("/tickets");
+                NavigationManager.NavigateTo("/tickets", forceLoad: false);
             }
         }
         catch (Exception ex)
         {
             // Log any errors and fall back to the tickets page
             Logger.LogError(ex, "Error navigating back from equipment detail");
-            NavigationManager.NavigateTo("/tickets");
+            NavigationManager.NavigateTo("/tickets", forceLoad: false);
         }
     }
 }

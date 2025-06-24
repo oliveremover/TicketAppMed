@@ -61,7 +61,7 @@
                 <div class="content-body">
                     @if (ticket.Equipment != null)
                     {
-                        <EquipmentComp Equipment="ticket.Equipment" OnRemove="RemoveEquipment" TicketId="ticket.EquipmentNumber"/>
+                        <EquipmentComp Equipment="ticket.Equipment" OnRemove="RemoveEquipment" TicketId="ticket.ID"/>
                     }
                     else
                     {
@@ -379,10 +379,11 @@
     protected override async Task OnInitializedAsync()
     {
         ticket = await TicketService.GetTicketByIdAsync(Id);
+    
         // If ticket has an equipment ID but the equipment object is null, load it
         if (ticket?.EquipmentNumber != null && ticket?.Equipment == null)
         {
-            ticket.Equipment = await EquipmentService.GetEquipmentByIdAsync(ticket.EquipmentNumber.Value);
+            ticket.Equipment = await EquipmentService.GetEquipmentByNumberAsync(ticket.EquipmentNumber.Value);
         }
     }
 

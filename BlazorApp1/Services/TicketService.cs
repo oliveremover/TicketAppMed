@@ -85,8 +85,17 @@ namespace BlazorApp1.Services
         public async Task<Ticket?> GetTicketByIdAsync(int id)
         {
             InitializeMockData();
-            await Task.Delay(500); // Simulate network delay
-            return _mockTickets.FirstOrDefault(t => t.ID == id);
+            await Task.Delay(300); // Simulate network delay
+            
+            var ticket = _mockTickets.FirstOrDefault(t => t.ID == id);
+            
+            // If the ticket has equipment number but not the equipment object, load it
+            if (ticket?.EquipmentNumber != null && ticket?.Equipment == null)
+            {
+                ticket.Equipment = await _equipmentService.GetEquipmentByNumberAsync(ticket.EquipmentNumber.Value);
+            }
+            
+            return ticket;
         }
         
         public async Task<Ticket> CreateTicketAsync(Ticket ticket)
