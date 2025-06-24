@@ -11,7 +11,7 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    padding-bottom: 80px;
+    padding-bottom: 120px;
 }
 
 /* Header group - no longer sticky */
@@ -21,6 +21,9 @@
     display: flex;
     flex-direction: column;
     margin-bottom: 8px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
 }
 
 /* Search header */
