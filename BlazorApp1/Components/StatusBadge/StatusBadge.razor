@@ -1,18 +1,47 @@
 @namespace BlazorApp1.Components.StatusBadge
 @using BlazorApp1.Models
 
-<div class="status-badge @GetStatusClass()">
-    <i class="bi @GetStatusIcon() me-1"></i>
-    @GetStatusText()
+<div class="status-badge @StatusClass">
+    <i class="bi @StatusIcon me-1"></i>
+    @StatusText
 </div>
 
 @code {
     [Parameter]
-    public TicketStatus Status { get; set; } = TicketStatus.Open;
+    public object Status { get; set; } = TicketStatus.Open;
 
-    private string GetStatusClass()
+    [Parameter]
+    public string StatusClass { get; set; } = "";
+    
+    [Parameter]
+    public string StatusIcon { get; set; } = "";
+    
+    [Parameter]
+    public string StatusText { get; set; } = "";
+
+    protected override void OnInitialized()
     {
-        return Status switch
+        if (Status != null)
+        {
+            if (Status is TicketStatus ticketStatus)
+            {
+                StatusClass = GetTicketStatusClass(ticketStatus);
+                StatusIcon = GetTicketStatusIcon(ticketStatus);
+                StatusText = ticketStatus.ToDisplayString();
+            }
+            else if (Status is EquipmentStatus equipmentStatus)
+            {
+                StatusClass = GetEquipmentStatusClass(equipmentStatus);
+                StatusText = equipmentStatus.ToDisplayString();
+            }
+        }
+        
+        base.OnInitialized();
+    }
+
+    private string GetTicketStatusClass(TicketStatus status)
+    {
+        return status switch
         {
             TicketStatus.Open => "status-open",
             TicketStatus.Pending => "status-pending",
@@ -21,9 +50,9 @@
         };
     }
 
-    private string GetStatusIcon()
+    private string GetTicketStatusIcon(TicketStatus status)
     {
-        return Status switch
+        return status switch
         {
             TicketStatus.Open => "bi-exclamation-circle",
             TicketStatus.Pending => "bi-hourglass-split",
@@ -32,8 +61,15 @@
         };
     }
 
-    private string GetStatusText()
+    private string GetEquipmentStatusClass(EquipmentStatus status)
     {
-        return Status.ToDisplayString();
+        return status switch
+        {
+            EquipmentStatus.Available => "status-green",
+            EquipmentStatus.InUse => "status-green",
+            EquipmentStatus.UnderMaintenance => "status-red",
+            EquipmentStatus.Defective => "status-red",
+            _ => "status-unknown"
+        };
     }
 }

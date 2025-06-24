@@ -2,12 +2,13 @@
 @inject IEquipmentService EquipmentService
 @using BlazorApp1.Models
 @using BlazorApp1.Services
+@using BlazorApp1.Components.StatusBadge
 
 <div class="wizard-step-container">
     <div class="wizard-content">
         <div class="mx-2">
-            <h3>Velg utstyr</h3>
-            <p>Søk opp og velg ønsket utstyr.</p>
+            <h3>@(selectedEquipment != null ? "Utstyr valgt" : "Velg utstyr")</h3>
+            <p>@(selectedEquipment != null ? "Utstyret nedenfor har blitt valgt for denne henvendelsen." : "Søk etter og velg utstyr for denne henvendelsen.")</p>
             
             @if (selectedEquipment == null)
             {
@@ -91,55 +92,72 @@
 
             @if (selectedEquipment != null)
             {
-                <div class="selected-equipment-info mt-4">
-                    <div class="equipment-card">
+                <div class="selected-equipment-info mt-3">
+                    <div class="equipment-card enhanced">
                         <div class="equipment-header">
-                            <h5>@selectedEquipment.DeviceType</h5>
-                            <button class="btn btn-sm btn-outline-danger" @onclick="RemoveSelectedEquipment">
+                            <div class="title-status-group">
+                                <h5>@selectedEquipment.DeviceType</h5>
+                                <StatusBadge Status="@selectedEquipment.Status" />
+                            </div>
+                            <button class="btn btn-sm btn-outline-danger remove-btn" @onclick="RemoveSelectedEquipment" aria-label="Remove equipment">
                                 <i class="bi bi-x-lg"></i>
                             </button>
                         </div>
-                        <div class="equipment-details">
-                            <div class="equipment-detail-item">
-                                <span class="label">Merke:</span>
-                                <span class="value">@selectedEquipment.Brand</span>
-                            </div>
-                            <div class="equipment-detail-item">
-                                <span class="label">Modell:</span>
-                                <span class="value">@selectedEquipment.Model</span>
-                            </div>
-                            <div class="equipment-detail-item">
-                                <span class="label">Serienummer:</span>
-                                <span class="value">@selectedEquipment.SerialNumber</span>
+
+                        <div class="equipment-content">
+                            @if (!string.IsNullOrEmpty(selectedEquipment.ImageUrl))
+                            {
+                                <div class="equipment-image-container">
+                                    <img src="@selectedEquipment.ImageUrl" alt="@selectedEquipment.DeviceType" />
+                                </div>
+                            }
+                            <div class="equipment-details">
+                                <div class="equipment-detail-item">
+                                    <div class="label">Eq. no:</div>
+                                    <div class="value">@selectedEquipment.EquipmentNumber</div>
+                                </div>
+                                <div class="equipment-detail-item">
+                                    <div class="label">Brand:</div>
+                                    <div class="value">@selectedEquipment.Brand</div>
+                                </div>
+                                <div class="equipment-detail-item">
+                                    <div class="label">Modell:</div>
+                                    <div class="value">@selectedEquipment.Model</div>
+                                </div>
+                                <div class="equipment-detail-item">
+                                    <div class="label">Serienummer:</div>
+                                    <div class="value">@selectedEquipment.SerialNumber</div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    
 
-                    <div class="switches-section mt-4">
-                        <h5 class="mb-3">Tilleggsvalg</h5>
+                    <div class="switches-section mt-3">
+                        <h5 class="mb-2">Tilleggsvalg</h5>
                         
-                        <div class="custom-switch-container mb-3">
-                            <label class="custom-switch-label" for="isContaminated">
-                                Utstyret er forurenset
-                            </label>
-                            <div class="custom-switch-input">
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="isContaminated" @bind="Model.isContaminated">
-                                    <span class="toggle-slider"></span>
+                        <div class="options-container">
+                            <div class="custom-switch-container">
+                                <label class="custom-switch-label" for="isContaminated">
+                                    <span>Utstyret er forurenset</span>
                                 </label>
+                                <div class="custom-switch-input">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="isContaminated" @bind="Model.isContaminated">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="custom-switch-container">
-                            <label class="custom-switch-label" for="isCleaned">
-                                Er apparatet rengjort?
-                            </label>
-                            <div class="custom-switch-input">
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="isCleaned" @bind="Model.isCleaned">
-                                    <span class="toggle-slider"></span>
+                            
+                            <div class="custom-switch-container">
+                                <label class="custom-switch-label" for="isCleaned">
+                                    <span>Er apparatet rengjort?</span>
                                 </label>
+                                <div class="custom-switch-input">
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="isCleaned" @bind="Model.isCleaned">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -164,22 +182,15 @@
     
     protected override async Task OnInitializedAsync()
     {
-        // If model already has equipment info stored, try to get it
+        // If model already has equipment info stored, load it
         if (Model.EquipmentNumber.HasValue)
         {
-            var equipment = await EquipmentService.GetEquipmentByIdAsync(Model.EquipmentNumber.Value);
+            var equipment = await EquipmentService.GetEquipmentByNumberAsync(Model.EquipmentNumber.Value);
             if (equipment != null)
             {
                 selectedEquipment = equipment;
                 selectedEquipmentNumber = equipment.EquipmentNumber;
             }
-        }
-        
-        // Only perform initial search if no equipment is selected
-        if (selectedEquipment == null)
-        {
-            // Do not auto-search at beginning - wait for user input
-            // await SearchEquipment();
         }
     }
 

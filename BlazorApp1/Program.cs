@@ -1,6 +1,7 @@
 using BlazorApp1.Components;
 using BlazorApp1.Services;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.AspNetCore.WebUtilities;
 
 var builder = WebApplication.CreateBuilder(args);
 

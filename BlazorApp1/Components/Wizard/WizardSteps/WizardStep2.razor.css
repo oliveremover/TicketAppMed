@@ -6,6 +6,7 @@
 .wizard-content {
     padding: 0 8px;
     margin-top: 20px;
+    margin-bottom: 64px;
 }
 
 .wizard-content h3 {
@@ -70,14 +71,14 @@
     flex-direction: column;
     gap: 8px;
     margin-bottom: 16px;
-    max-height: 400px;
     overflow-y: auto;
+    max-height: 50vh;
 }
 
 .equipment-item {
     background-color: #ffffff;
     border-radius: 8px;
-    padding: 12px;
+    padding: 16px 12px;
     cursor: pointer;
     transition: background-color 0.2s ease;
     border: 1px solid #e9ecef;
@@ -169,6 +170,20 @@
     background-color: #f8f9fa;
 }
 
+.equipment-card.enhanced {
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+    background-color: white;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    margin: 0 -8px; /* Extend card to edges on mobile */
+}
+
+.equipment-card.enhanced:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+}
+
 .equipment-header {
     display: flex;
     justify-content: space-between;
@@ -180,6 +195,76 @@
     margin: 0;
     font-size: 18px;
     font-weight: 600;
+}
+
+.equipment-card.enhanced .equipment-header {
+    padding: 12px 16px; /* Slightly reduce vertical padding on mobile */
+    border-bottom: 1px solid #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.equipment-card.enhanced .title-status-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.equipment-card.enhanced .title-status-group h5 {
+    margin-bottom: 0;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.equipment-card.enhanced .remove-btn {
+    padding: 4px 8px;
+    border-radius: 6px;
+}
+
+.equipment-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+}
+
+.equipment-card.enhanced .equipment-content {
+    flex-direction: column;
+    padding: 16px;
+    align-items: flex-start;
+}
+
+.equipment-card.enhanced .equipment-icon-container,
+.equipment-card.enhanced .equipment-image-container {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16/9;
+    margin-right: 0;
+    margin-bottom: 16px;
+}
+
+.equipment-card.enhanced .equipment-details {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+.equipment-card.enhanced .equipment-detail-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.equipment-card.enhanced .label {
+    font-size: 0.8rem;
+    color: #6c757d;
+    margin-bottom: 2px;
+}
+
+.equipment-card.enhanced .value {
+    font-weight: 500;
 }
 
 .equipment-details {
@@ -223,6 +308,27 @@
     margin-bottom: 16px;
 }
 
+.switches-section {
+    background-color: white;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+}
+
+.switches-section h5 {
+    font-size: 1rem;
+    color: #212529;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
 .custom-switch-container {
     display: flex;
     justify-content: space-between;
@@ -231,9 +337,10 @@
 }
 
 .custom-switch-label {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
     margin-bottom: 0;
-    flex-grow: 1;
-    padding-right: 12px;
 }
 
 .custom-switch-input {
@@ -246,7 +353,7 @@
 .toggle-switch {
     position: relative;
     display: inline-block;
-    width: 48px;
+    width: 50px;
     height: 24px;
 }
 
@@ -264,35 +371,161 @@
     right: 0;
     bottom: 0;
     background-color: #ccc;
-    transition: .2s;
+    transition: .4s;
     border-radius: 24px;
 }
 
 .toggle-slider:before {
     position: absolute;
     content: "";
-    height: 18px;
-    width: 18px;
-    left: 3px;
-    bottom: 3px;
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
     background-color: white;
-    transition: .2s;
+    transition: .4s;
     border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
 
 input:checked + .toggle-slider {
     background-color: #0d6efd;
 }
 
-input:focus + .toggle-slider {
-    box-shadow: 0 0 1px #0d6efd;
+input:checked + .toggle-slider:before {
+    transform: translateX(26px);
+}
+
+@media (max-width: 576px) {
+    .equipment-card.enhanced .equipment-details {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Improved mobile styling for selected equipment card */
+.equipment-card.enhanced {
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    border: 1px solid #e9ecef;
+    background-color: white;
+    overflow: hidden;
+    transition: all 0.2s ease;
+    margin: 0 -8px; /* Extend card to edges on mobile */
+}
+
+.equipment-card.enhanced .equipment-header {
+    padding: 12px 16px; /* Slightly reduce vertical padding on mobile */
+}
+
+.equipment-card.enhanced .title-status-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.equipment-card.enhanced .equipment-content {
+    flex-direction: column;
+    padding: 16px;
+    align-items: flex-start;
+}
+
+.equipment-card.enhanced .equipment-icon-container,
+.equipment-card.enhanced .equipment-image-container {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16/9;
+    margin-right: 0;
+    margin-bottom: 16px;
+}
+
+.equipment-card.enhanced .equipment-details {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 12px;
+}
+
+/* Responsive switches section */
+.switches-section {
+    margin: 16px -8px 0;
+    border-radius: 12px;
+}
+
+.custom-switch-container {
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.custom-switch-label {
+    font-size: 14px;
+}
+
+/* Media query for tablets and up */
+@media (min-width: 576px) {
+    .equipment-card.enhanced {
+        margin: 0; /* Reset margins on larger screens */
+    }
+    
+    .equipment-card.enhanced .title-status-group {
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    .equipment-card.enhanced .equipment-content {
+        flex-direction: row;
+        align-items: flex-start;
+    }
+    
+    .equipment-card.enhanced .equipment-icon-container,
+    .equipment-card.enhanced .equipment-image-container {
+        width: 80px;
+        height: 80px;
+        aspect-ratio: auto;
+        margin-right: 16px;
+        margin-bottom: 0;
+    }
+    
+    .equipment-card.enhanced .equipment-details {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .switches-section {
+        margin: 16px 0 0;
+    }
+}
+
+/* Touch-friendly adjustments */
+.remove-btn {
+    min-height: 38px;
+    min-width: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Better spacing on mobile */
+.equipment-detail-item .label {
+    font-size: 0.75rem;
+    margin-bottom: 2px;
+}
+
+.equipment-detail-item .value {
+    font-size: 0.9rem;
+    word-break: break-word;
+}
+
+/* Make toggle switches more touch-friendly */
+.toggle-switch {
+    width: 56px;
+    height: 28px;
+}
+
+.toggle-slider:before {
+    height: 20px;
+    width: 20px;
 }
 
 input:checked + .toggle-slider:before {
-    transform: translateX(24px);
+    transform: translateX(28px);
 }
 
-.toggle-slider:active:before {
-    width: 24px;
-}

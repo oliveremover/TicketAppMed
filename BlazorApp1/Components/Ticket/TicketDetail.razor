@@ -61,7 +61,7 @@
                 <div class="content-body">
                     @if (ticket.Equipment != null)
                     {
-                        <EquipmentComp Equipment="ticket.Equipment" OnRemove="RemoveEquipment" />
+                        <EquipmentComp Equipment="ticket.Equipment" OnRemove="RemoveEquipment" TicketId="ticket.EquipmentNumber"/>
                     }
                     else
                     {

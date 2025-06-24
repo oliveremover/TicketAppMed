@@ -1,69 +1,98 @@
-@page "/equipments/{EquipmentNumber:int}"
+@page "/equipment/{EquipmentNumber:int}"
 @rendermode InteractiveServer
-@using BlazorApp1.Components.Equipment
 @using BlazorApp1.Models
 @using BlazorApp1.Services
-@inject EquipmentService EquipmentService
+@using BlazorApp1.Components.StatusBadge
+@inject IEquipmentService EquipmentService
 @inject NavigationManager NavigationManager
 @inject ILogger<EquipmentDetail> Logger
 
-<PageTitle>Equipment Details - @EquipmentNumber</PageTitle>
+<PageTitle>Equipment Details</PageTitle>
 
-<h3>Equipment Details</h3>
-
-@if (isLoading)
-{
-    <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">Loading...</span>
+<div class="equipment-detail-container">
+    <!-- Back button header -->
+    <div class="equipment-header">
+        <button aria-label="Navigate back" class="back-button" @onclick="GoBack">
+            <i class="bi bi-arrow-left"></i>
+        </button>
+        <h3 class="mb-0">Equipment Details</h3>
     </div>
-}
-else if (equipment == null)
-{
-    <div class="alert alert-warning">
-        Equipment not found or an error occurred while loading.
-    </div>
-}
-else
-{
-    <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <span>Equipment #@equipment.EquipmentNumber</span>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6">
-                    <dl class="row">
-                        <dt class="col-sm-4">Device Type</dt>
-                        <dd class="col-sm-8">@equipment.DeviceType</dd>
 
-                        <dt class="col-sm-4">Brand</dt>
-                        <dd class="col-sm-8">@equipment.Brand</dd>
-
-                        <dt class="col-sm-4">Model</dt>
-                        <dd class="col-sm-8">@equipment.Model</dd>
-
-                        <dt class="col-sm-4">Serial Number</dt>
-                        <dd class="col-sm-8">@equipment.SerialNumber</dd>
-                    </dl>
-                </div>
-                <div class="col-md-6">
-                    <dl class="row">
-                        <dt class="col-sm-4">Alt ID</dt>
-                        <dd class="col-sm-8">@equipment.AltID</dd>
-
-                        <dt class="col-sm-4">Code</dt>
-                        <dd class="col-sm-8">@equipment.Code</dd>
-                    </dl>
-                </div>
+    @if (isLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
             </div>
         </div>
-    </div>
+    }
+    else if (equipment == null)
+    {
+        <div class="alert alert-warning mx-3 mt-3">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            Equipment not found or an error occurred while loading.
+        </div>
+    }
+    else
+    {
+        <div class="equipment-card"> 
+            <!-- Equipment title section -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="equipment-title mb-0">@equipment.DeviceType</h2>
+                <StatusBadge Status="@equipment.Status" />
+            </div>
+            
+            <!-- Equipment image if available -->
+            @if (!string.IsNullOrEmpty(equipment.ImageUrl))
+            {
+                <div class="equipment-image-container">
+                    <img src="@equipment.ImageUrl" alt="@equipment.DeviceType" class="equipment-image" />
+                </div>
+            }
+            
+            <!-- Equipment sections with consistent styling -->
+            <div class="content-section">
+                <h4 class="section-title">
+                    <i class="bi bi-info-circle me-2"></i>Basic Information
+                </h4>
+                <div class="content-body">
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Eq. No:</span>
+                            <span class="info-value">@equipment.EquipmentNumber</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Brand</span>
+                            <span class="info-value">@equipment.Brand</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Model</span>
+                            <span class="info-value">@equipment.Model</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Serial Number</span>
+                            <span class="info-value">@equipment.SerialNumber</span>
+                        </div>
 
+                        <div class="info-item">
+                            <span class="info-label">Alt ID</span>
+                            <span class="info-value">@equipment.AltID</span>
+                        </div>
+                        <div class="info-item">
+                                <span class="info-label">Code</span>
+                                <span class="info-value">@equipment.Code</span>
+                        </div> 
+                    </div>
+                </div>
+            </div>
+            
 
-    <div class="mt-3">
-        <button class="btn btn-secondary" @onclick="GoBack">Back to List</button>
+        </div>
+    }
+    <div class="action-buttons">
+        <Btn Text="Create new Ticket" NavigateTo="@($"/createTicket?equipmentId={EquipmentNumber}")" />
     </div>
-}
+</div>
 
 @code {
     [Parameter]
@@ -92,30 +121,47 @@ else
 
     private void GoBack()
     {
-        NavigationManager.NavigateTo("/equipments");
-    }
-
-    private string GetStatusBadgeClass(string status)
-    {
-        return status?.ToLower() switch
+        try
         {
-            "operational" => "bg-success",
-            "maintenance" => "bg-warning",
-            "broken" => "bg-danger",
-            "retired" => "bg-secondary",
-            _ => "bg-info"
-        };
-    }
-
-    private string GetTicketStatusBadgeClass(string status)
-    {
-        return status?.ToLower() switch
+            // Parse the current URI to extract any query parameters
+            var uri = new Uri(NavigationManager.Uri);
+            var queryString = System.Web.HttpUtility.ParseQueryString(uri.Query);
+            
+            // Check if we have a returnUrl query parameter
+            string? returnUrl = queryString["returnUrl"];
+            
+            if (!string.IsNullOrEmpty(returnUrl))
+            {
+                // Remove any leading slash for consistency
+                returnUrl = returnUrl.TrimStart('/');
+                
+                if (returnUrl.StartsWith("ticket/") || returnUrl.StartsWith("tickets/"))
+                {
+                    // Navigate to the ticket
+                    NavigationManager.NavigateTo("/" + returnUrl);
+                }
+                else if (int.TryParse(returnUrl, out int ticketId))
+                {
+                    // If returnUrl is just a number, assume it's a ticket ID
+                    NavigationManager.NavigateTo($"/tickets/{ticketId}");
+                }
+                else
+                {
+                    // Otherwise, just try to navigate to the provided URL
+                    NavigationManager.NavigateTo(returnUrl);
+                }
+            }
+            else
+            {
+                // If no returnUrl is specified, go back to the equipment list or tickets page
+                NavigationManager.NavigateTo("/tickets");
+            }
+        }
+        catch (Exception ex)
         {
-            "open" => "bg-danger",
-            "in progress" => "bg-warning",
-            "resolved" => "bg-success",
-            "closed" => "bg-secondary",
-            _ => "bg-info"
-        };
+            // Log any errors and fall back to the tickets page
+            Logger.LogError(ex, "Error navigating back from equipment detail");
+            NavigationManager.NavigateTo("/tickets");
+        }
     }
 }

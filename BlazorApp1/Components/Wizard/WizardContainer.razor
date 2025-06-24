@@ -2,6 +2,7 @@
 @inject IEquipmentService EquipmentService
 @using BlazorApp1.Models
 @using BlazorApp1.Services
+@using Microsoft.AspNetCore.WebUtilities
 @rendermode InteractiveServer
 
 <CascadingValue Value="Model">
@@ -25,7 +26,6 @@
             </div>
         </div>
         <div class="content-area">
-
             @if (Step == 1)
             {
                 <WizardStep1 OnCategorySelected="Next" />
@@ -49,13 +49,51 @@
                 }
             </div>
         </div>
+        
+        @if (hasPreselectedEquipment && Step == 1)
+        {
+            <div class="preselected-equipment-banner">
+                <div class="preselected-content">
+                    <i class="bi bi-hdd me-2"></i>
+                    <span>Equipment pre-selected: @preselectedEquipmentName</span>
+                </div>
+            </div>
+        }
     </div>
 </CascadingValue>
 
 @code {
     private WizardModel Model { get; set; } = new WizardModel();
+    private bool hasPreselectedEquipment = false;
+    private string preselectedEquipmentName = "";
     
     public int Step { get; set; } = 1;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Parse the URL to check for equipment ID
+        var uri = new Uri(Navigation.Uri);
+        var queryParams = QueryHelpers.ParseQuery(uri.Query);
+        
+        if (queryParams.TryGetValue("equipmentId", out var equipmentIdValue) && 
+            int.TryParse(equipmentIdValue, out int equipmentId))
+        {
+            // Get the equipment
+            var equipment = await EquipmentService.GetEquipmentByNumberAsync(equipmentId);
+            if (equipment != null)
+            {
+                // Pre-populate the wizard model with equipment data
+                Model.EquipmentNumber = equipment.EquipmentNumber;
+                Model.Equipment = $"{equipment.DeviceType} {equipment.Brand} {equipment.Model}";
+                
+                hasPreselectedEquipment = true;
+                preselectedEquipmentName = $"{equipment.EquipmentNumber}: {equipment.DeviceType} - {equipment.Brand} {equipment.Model}";
+                
+                // Keep step 1 as starting point
+                Step = 1;
+            }
+        }
+    }
 
     private void Next()
     {
@@ -69,11 +107,6 @@
         StateHasChanged();
     }
 
-    private void CloseWizard()
-    {
-        // Navigate back to the previous page
-        Navigation.NavigateTo("/tickets");
-    }
     private void CreateTicket()
     {
         // Create new ticket with the wizard data
@@ -87,9 +120,6 @@
             Status = TicketStatus.Open
         };
 
-        // Use your TicketService to create the ticket
-        // await TicketService.CreateTicketAsync(newTicket);
-        
         // Navigate back to the tickets list
         Navigation.NavigateTo("/tickets");
     }

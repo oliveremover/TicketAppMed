@@ -1,0 +1,160 @@
+.equipment-detail-container {
+    padding: 0;
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Header styles */
+.equipment-header {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background-color: white;
+    border-bottom: 1px solid #e9ecef;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.back-button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    margin-right: 16px;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+}
+
+/* Card styles */
+.equipment-card {
+    flex: 1;
+    padding: 16px;
+    margin: 0;
+}
+
+.equipment-id {
+    font-family: monospace;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.equipment-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+/* Equipment image styling */
+.equipment-image-container {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.equipment-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+/* Section styles */
+.content-section {
+    margin-bottom: 16px;
+    border-top: 1px solid #e9ecef;
+    padding-top: 12px;
+}
+
+.section-title {
+    font-size: 15px;
+    color: #495057;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+}
+
+.content-body {
+    font-size: 14px;
+}
+
+/* Info grid layout */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: 12px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    padding: 4px 0;
+}
+
+.info-label {
+    font-weight: 500;
+    color: #6c757d;
+    font-size: 13px;
+    margin-bottom: 4px;
+}
+
+.info-value {
+    color: #212529;
+    font-size: 14px;
+    word-break: break-word;
+}
+
+/* Loading indicator */
+.loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+}
+
+/* Responsive styles */
+@media (min-width: 768px) {
+    .equipment-card {
+        max-width: 768px;
+        margin: 0 auto 24px;
+        padding: 24px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    
+    .equipment-title {
+        font-size: 24px;
+    }
+    
+    .section-title {
+        font-size: 18px;
+    }
+    
+    .info-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+    
+    .info-label {
+        font-size: 14px;
+    }
+    
+    .info-value {
+        font-size: 15px;
+    }
+}
+
+.action-buttons {
+    position: fixed;
+    bottom: 5rem;
+    display: flex;
+    gap: 8px;
+    z-index: 1000;
+    width: 100%;
+    justify-content: center;
+    padding: 0 8px;
+}

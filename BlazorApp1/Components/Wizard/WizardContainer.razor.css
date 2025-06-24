@@ -35,3 +35,28 @@
     justify-content: center;
     padding: 0 8px;
 }
+
+/* Preselected equipment banner */
+.preselected-equipment-banner {
+    position: fixed;
+    bottom: 9rem;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 0 16px;
+    z-index: 1000;
+}
+
+.preselected-content {
+    background-color: rgba(13, 110, 253, 0.1);
+    color: #0d6efd;
+    padding: 8px 16px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    max-width: 500px;
+    margin: 0 auto;
+}
