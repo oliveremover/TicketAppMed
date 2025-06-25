@@ -24,25 +24,213 @@ namespace BlazorApp1.Services
         {
             if (_initialized) return;
 
-            // Create sample equipment data
-            var random = new Random();
-            var equipmentTypes = new[] { "Computer", "Printer", "Scanner", "Server", "Monitor", "Microscope", "Analyzer" };
-            var locations = new[] { "Drammen", "Bærum", "Kongsberg", "Ringerike", "Mikrobiologen" };
-            var brands = new[] { "HP", "Dell", "Lenovo", "Canon", "Epson", "Cisco", "Zeiss", "Olympus", "Roche" };
-            var codes = new[] { "LAB", "IT", "MED", "ADMIN", "RESEARCH" };
-
-            _mockEquipment = Enumerable.Range(1, 20).Select(i => new Equipment
+            _mockEquipment = new List<Equipment>
             {
-                EquipmentNumber = i,
-                Brand = brands[random.Next(brands.Length)],
-                DeviceType = equipmentTypes[random.Next(equipmentTypes.Length)],
-                Model = $"{(char)('A' + random.Next(26))}{random.Next(100)}",
-                SerialNumber = $"SN-{random.Next(10000, 99999)}",
-                AltID = random.Next(0, 2) == 0 ? $"ALT-{random.Next(1000, 9999)}" : string.Empty,
-                Code = random.Next(0, 2) == 0 ? $"{codes[random.Next(codes.Length)]}-{random.Next(100, 999)}" : string.Empty,
-                ImageUrl = random.Next(0, 2) == 0 ? "/icon-192.png" : null,
-                Status = (EquipmentStatus)random.Next(0, 4),
-            }).ToList();
+                new Equipment
+                {
+                    EquipmentNumber = 1,
+                    Brand = "Zoll",
+                    DeviceType = "Defibrillator halvautomatisk (AED)",
+                    Model = "AED Pro",
+                    SerialNumber = "900057",
+                    AltID = null,
+                    Code = "SE48049-00057",
+                    ImageUrl = "/ZOLL_AED-Pro.png",
+                    Status = EquipmentStatus.InUse
+                },
+                new Equipment
+                {
+                    EquipmentNumber = 2,
+                    Brand = "Zoll",
+                    DeviceType = "Batteri, laddningsbart, mobilt",
+                    Model = "AutoPulse Li-Ion battery",
+                    SerialNumber = "100010",
+                    AltID = null,
+                    Code = "SE36534-00010",
+                    ImageUrl = null,
+                    Status = EquipmentStatus.UnderMaintenance
+                },
+                new Equipment
+                {
+                    EquipmentNumber = 3,
+                    Brand = "Zoll",
+                    DeviceType = "Defibrillator med patientmonitorering",
+                    Model = "R Series Plus",
+                    SerialNumber = "800001",
+                    AltID = null,
+                    Code = "SE17882-00001",
+                    ImageUrl = "/Product_R_Zoll.jpg",
+                    Status = EquipmentStatus.InUse
+                },
+                new Equipment
+                {
+                    EquipmentNumber = 4,
+                    Brand = "Zoll",
+                    DeviceType = "Defibrillator med patientmonitorering",
+                    Model = "R Series ALS",
+                    SerialNumber = "400002",
+                    AltID = null,
+                    Code = "SE17882-00002",
+                    ImageUrl = null,
+                    Status = EquipmentStatus.UnderMaintenance
+                },
+                new Equipment
+                {
+                    EquipmentNumber = 5,
+                    Brand = "Zoll",
+                    DeviceType = "EKG-simulator",
+                    Model = "ECG Simulator for ZOLL M & R Series Defibrillators",
+                    SerialNumber = "200004",
+                    AltID = null,
+                    Code = "SE35026-00004",
+                    ImageUrl = "/icon-192.png",
+                    Status = EquipmentStatus.InUse
+                },
+                new Equipment
+                {
+                    EquipmentNumber = 6,
+                    Brand = "Zoll",
+                    DeviceType = "Batteri, laddningsbart, mobilt",
+                    Model = "SurePower Battery Pack",
+                    SerialNumber = "300012",
+                    AltID = null,
+                    Code = "SE36534-00012",
+                    ImageUrl = null,
+                    Status = EquipmentStatus.UnderMaintenance
+                },
+                new Equipment
+                {
+                    EquipmentNumber = 7,
+                    Brand = "Zoll",
+                    DeviceType = "Defibrillator med patientmonitorering",
+                    Model = "R Series",
+                    SerialNumber = "200003",
+                    AltID = null,
+                    Code = "SE17882-00003",
+                    ImageUrl = "/icon-192.png",
+                    Status = EquipmentStatus.InUse
+                },
+                new Equipment
+                {
+                    EquipmentNumber = 8,
+                    Brand = "Zoll",
+                    DeviceType = "Hjärtkompressionsapparat",
+                    Model = "AutoPulse",
+                    SerialNumber = "100002",
+                    AltID = null,
+                    Code = "SE35309-00002",
+                    ImageUrl = "/icon-192.png",
+                    Status = EquipmentStatus.UnderMaintenance
+                },
+                new Equipment
+                {
+                    EquipmentNumber = 9,
+                    Brand = "Zoll",
+                    DeviceType = "Hypotermirustning intravasål",
+                    Model = "Thermogard XP",
+                    SerialNumber = "400001",
+                    AltID = null,
+                    Code = "SET1538-00001",
+                    ImageUrl = null,
+                    Status = EquipmentStatus.InUse
+                },
+                new Equipment
+                {
+                    EquipmentNumber = 10,
+                    Brand = "Zoll",
+                    DeviceType = "EKG-simulator",
+                    Model = "AED Pro Simulator",
+                    SerialNumber = "100040",
+                    AltID = null,
+                    Code = "SE35026-00040",
+                    ImageUrl = "/icon-192.png",
+                    Status = EquipmentStatus.UnderMaintenance
+                },
+                new Equipment
+                {
+                    EquipmentNumber = 11,
+                    Brand = "Zoll",
+                    DeviceType = "Testinstrument batterier",
+                    Model = "SurePower System",
+                    SerialNumber = "100010",
+                    AltID = null,
+                    Code = "SE37174-00010",
+                    ImageUrl = "/icon-192.png",
+                    Status = EquipmentStatus.UnderMaintenance
+                },
+                new Equipment
+                {
+                    EquipmentNumber = 12,
+                    Brand = "Zoll",
+                    DeviceType = "Defibrillator halvautomatisk (AED)",
+                    Model = "AED 3 BLS",
+                    SerialNumber = "900074",
+                    AltID = null,
+                    Code = "SE48049-00074",
+                    ImageUrl = null,
+                    Status = EquipmentStatus.UnderMaintenance
+                },
+                new Equipment
+                {
+                    EquipmentNumber = 13,
+                    Brand = "Zoll",
+                    DeviceType = "Givare för CO2-mätning i andningsslang",
+                    Model = "9355-000590",
+                    SerialNumber = "300000",
+                    AltID = "1",
+                    Code = "EU46822-00000",
+                    ImageUrl = "/icon-192.png",
+                    Status = EquipmentStatus.UnderMaintenance
+                },
+                new Equipment
+                {
+                    EquipmentNumber = 14,
+                    Brand = "Zoll",
+                    DeviceType = "Defibrillator halvautomatisk (AED)",
+                    Model = "XSCP-1",
+                    SerialNumber = "000003",
+                    AltID = null,
+                    Code = "EU48049-00003",
+                    ImageUrl = null,
+                    Status = EquipmentStatus.UnderMaintenance
+                },
+                new Equipment
+                {
+                    EquipmentNumber = 15,
+                    Brand = "Zoll",
+                    DeviceType = "Defibrillator halvautomatisk (AED)",
+                    Model = "AED 3",
+                    SerialNumber = "60004",
+                    AltID = null,
+                    Code = "EU48049-00004",
+                    ImageUrl = "/icon-192.png",
+                    Status = EquipmentStatus.UnderMaintenance
+                },
+                new Equipment
+                {
+                    EquipmentNumber = 16,
+                    Brand = "Zoll",
+                    DeviceType = "Batteriladdare MTU",
+                    Model = "1119-0500",
+                    SerialNumber = "12010",
+                    AltID = null,
+                    Code = "EU17115-00010",
+                    ImageUrl = null,
+                    Status = EquipmentStatus.UnderMaintenance
+                },
+                new Equipment
+                {
+                    EquipmentNumber = 17,
+                    Brand = "Zoll",
+                    DeviceType = "Batteriladdare MTU",
+                    Model = "1211-000100-01",
+                    SerialNumber = "123123",
+                    AltID = null,
+                    Code = "EU17115-00011",
+                    ImageUrl = "/icon-192.png",
+                    Status = EquipmentStatus.UnderMaintenance
+                }
+            };
 
             _initialized = true;
         }

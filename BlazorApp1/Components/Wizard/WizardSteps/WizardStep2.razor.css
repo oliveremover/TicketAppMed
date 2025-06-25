@@ -238,7 +238,7 @@
 
 .equipment-card.enhanced .equipment-icon-container,
 .equipment-card.enhanced .equipment-image-container {
-    width: 100%;
+    width: 60%;
     height: auto;
     aspect-ratio: 16/9;
     margin-right: 0;
@@ -431,17 +431,21 @@ input:checked + .toggle-slider:before {
 
 .equipment-card.enhanced .equipment-icon-container,
 .equipment-card.enhanced .equipment-image-container {
-    width: 100%;
+    width:100%;
     height: auto;
     aspect-ratio: 16/9;
     margin-right: 0;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: center;
 }
-
+.equipment-card.enhanced .equipment-image-container img {
+    width: 50%;
+}
 .equipment-card.enhanced .equipment-details {
     width: 100%;
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
 }
 
