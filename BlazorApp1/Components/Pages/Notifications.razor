@@ -1,0 +1,214 @@
+@page "/notifications"
+@inherits LayoutComponentBase
+@rendermode InteractiveServer
+@inject ITicketService TicketService
+@inject NavigationManager Navigation
+@using BlazorApp1.Models
+@using BlazorApp1.Services
+@using BlazorApp1.Components.StatusBadge
+
+<PageTitle>Notifications</PageTitle>
+
+<div class="notifications-container">
+    <!-- Sticky header group following the pattern used in other pages -->
+    <div class="sticky-header-group">
+        <div class="notifications-header">
+            <button aria-label="Navigate back" class="back-button" @onclick="NavigateBack">
+                <i class="bi bi-arrow-left"></i>
+            </button>
+            <h3>Notifications</h3>
+            @if (notifications?.Any() == true)
+            {
+                <button class="btn btn-sm btn-link" @onclick="MarkAllAsRead">Mark all as read</button>
+            }
+        </div>
+    </div>
+
+    @if (isLoading)
+    {
+        <div class="loading-container">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else if (notifications?.Any() != true)
+    {
+        <div class="empty-state">
+            <i class="bi bi-bell large-icon"></i>
+            <p>No notifications yet</p>
+            <span class="text-muted">You'll be notified when there are updates to your tickets</span>
+        </div>
+    }
+    else
+    {
+        <div class="notifications-list">
+            @foreach (var notification in notifications)
+            {
+                <div class="notification-item @(notification.IsRead ? "" : "unread")" @onclick="() => NavigateToTicket(notification.TicketId)">
+                    <div class="notification-avatar">
+                        <div class="avatar-circle">
+                            <span>@GetInitials(notification.Author)</span>
+                        </div>
+                    </div>
+                    <div class="notification-content">
+                        <div class="notification-header">
+                            <span class="author">@FormatAuthorName(notification.Author)</span>
+                            <span class="ticket-id">Ticket #@notification.TicketId.ToString().PadLeft(6, '0')</span>
+                        </div>
+                        <p class="message">@notification.Message</p>
+                        <div class="notification-footer">
+                            <span class="time">@GetRelativeTime(notification.Date)</span>
+                            @if (!notification.IsRead)
+                            {
+                                <span class="badge bg-primary">New</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    private List<NotificationItem> notifications;
+    private bool isLoading = true;
+
+    // This represents a notification in our system
+    private class NotificationItem
+    {
+        public int Id { get; set; }
+        public int TicketId { get; set; }
+        public string Message { get; set; }
+        public string Author { get; set; }
+        public DateTime Date { get; set; }
+        public bool IsRead { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadNotificationsAsync();
+    }
+
+    private async Task LoadNotificationsAsync()
+    {
+        try
+        {
+            isLoading = true;
+            
+            // In a real application, you would fetch notifications from a service
+            // For now, we'll create mock data based on tickets and their comments
+            var tickets = await TicketService.GetAllTicketsAsync();
+            notifications = new List<NotificationItem>();
+            
+            if (tickets?.Any() == true)
+            {
+                int notificationId = 1;
+                foreach (var ticket in tickets)
+                {
+                    // For demonstration purposes, convert each comment into a notification
+                    if (ticket.Comments?.Any() == true)
+                    {
+                        foreach (var comment in ticket.Comments.OrderByDescending(c => c.Date).Take(3))
+                        {
+                            if (comment.Author != "current.user@example.com") // Don't notify about own comments
+                            {
+                                notifications.Add(new NotificationItem
+                                {
+                                    Id = notificationId++,
+                                    TicketId = ticket.ID,
+                                    Message = comment.Text,
+                                    Author = comment.Author,
+                                    Date = comment.Date,
+                                    IsRead = false
+                                });
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Sort notifications by date (newest first)
+            notifications = notifications.OrderByDescending(n => n.Date).ToList();
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void NavigateBack()
+    {
+        Navigation.NavigateTo("/");
+    }
+
+    private void NavigateToTicket(int ticketId)
+    {
+        // Mark the notification as read when clicked
+        var notification = notifications.FirstOrDefault(n => n.TicketId == ticketId && !n.IsRead);
+        if (notification != null)
+        {
+            notification.IsRead = true;
+        }
+        
+        Navigation.NavigateTo($"/tickets/{ticketId}");
+    }
+
+    private void MarkAllAsRead()
+    {
+        foreach (var notification in notifications)
+        {
+            notification.IsRead = true;
+        }
+    }
+
+    private string GetRelativeTime(DateTime date)
+    {
+        var timeSpan = DateTime.Now - date;
+
+        if (timeSpan.TotalDays > 30)
+            return date.ToString("MMM d");
+        else if (timeSpan.TotalDays > 1)
+            return $"{(int)timeSpan.TotalDays}d ago";
+        else if (timeSpan.TotalHours > 1)
+            return $"{(int)timeSpan.TotalHours}h ago";
+        else if (timeSpan.TotalMinutes > 1)
+            return $"{(int)timeSpan.TotalMinutes}m ago";
+        else
+            return "just now";
+    }
+
+    private string FormatAuthorName(string author)
+    {
+        if (author.Contains('@'))
+        {
+            var parts = author.Split('@');
+            var localPart = parts[0];
+            localPart = localPart.Replace('.', ' ').Replace('_', ' ');
+            return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(localPart);
+        }
+        
+        return author;
+    }
+
+    private string GetInitials(string name)
+    {
+        if (string.IsNullOrEmpty(name))
+            return "?";
+            
+        if (name.Contains('@'))
+        {
+            name = name.Split('@')[0];
+        }
+            
+        var parts = name.Split(new[] { '.', ' ', '_' }, StringSplitOptions.RemoveEmptyEntries);
+        if (!parts.Any())
+            return "?";
+            
+        if (parts.Length == 1)
+            return parts[0].Substring(0, 1).ToUpper();
+            
+        return (parts[0].Substring(0, 1) + parts[parts.Length - 1].Substring(0, 1)).ToUpper();
+    }
+}
