@@ -13,7 +13,9 @@
     padding-bottom: 120px;
 }
 
-
+.search-header {
+        padding: 12px 12px 0px 12px;
+}
 /* Filter section */
 .filter-container {
     padding: 12px;

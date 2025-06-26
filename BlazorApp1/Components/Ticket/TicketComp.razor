@@ -2,35 +2,28 @@
 @using BlazorApp1.Components.StatusBadge
 @using BlazorApp1.Models
 
-<div class="ticket-item" @onclick="() => OnTicketClick.InvokeAsync(Ticket.ID)">
-    <div class="ticket-content">
-        <div class="ticket-top-row">
-            <div class="ticket-id">@Ticket.GetFormattedID()</div>
-            <div class="ticket-time">
-                <i class="bi bi-calendar3 me-1"></i>
-                <span>@Ticket.GetTimeAgo()</span>
-            </div>
+<Card   Title="@Ticket.Header"
+        IsClickable="true"
+        ShowChevron="true"
+        OnClick="@(() => OnTicketClick.InvokeAsync(Ticket.ID))">
+    <HeaderContent>
+        <div class="ticket-id">@Ticket.GetFormattedID()</div>
+        <div class="ticket-time">
+            <i class="bi bi-calendar3 me-1"></i>
+            <span>@Ticket.GetTimeAgo()</span>
+        </div> 
+    </HeaderContent>
+    <BodyContent>
+        @Ticket.Details
+    </BodyContent>
+    <FooterContent>
+        <div class="ticket-ref">
+            <i class="bi bi-tag me-1"></i>
+            <span>@Ticket.Category</span>
         </div>
-        @if (!string.IsNullOrEmpty(Ticket.Header))
-        {
-            <div class="ticket-title" title="@Ticket.Header">@Ticket.Header</div>
-        }
-        @if (!string.IsNullOrEmpty(Ticket.Details))
-        {
-            <div class="ticket-desc">@Ticket.Details</div>
-        }
-        <div class="ticket-footer">
-            <div class="ticket-ref">
-                <i class="bi bi-tag me-1"></i>
-                <span>@Ticket.Category</span>
-            </div>
-            <StatusBadge Status="@Ticket.Status" />
-        </div>
-    </div>
-    <div class="chevron">
-        <i class="bi bi-chevron-right"></i>
-    </div>
-</div>
+        <StatusBadge Status="@Ticket.Status" />
+    </FooterContent>
+</Card>
 
 @code {
     [Parameter]

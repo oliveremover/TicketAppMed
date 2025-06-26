@@ -1,55 +1,42 @@
 @using BlazorApp1.Models
 @using BlazorApp1.Components.StatusBadge
 @rendermode InteractiveServer
+@inject NavigationManager Navigation
 
-<div class="equipment-card">
-    <div class="equipment-header">
-        <h5 class="device-type">@Equipment.DeviceType</h5>
-        <div class="action-buttons">
+<Card Title="@Equipment.DeviceType" ShowChevron="true" IsClickable="true" OnClick="@(() => NavigateToEquipment())">
+    <HeaderContent>
+        <span class="label">Eq.no: <span class="value">@Equipment.EquipmentNumber</span></span>
+        <StatusBadge Status="@Equipment.Status" />
+    </HeaderContent>
+    <BodyContent>
+        <div class="equipment-details">
+            <div class="equipment-detail-item">
+                <span class="label">Kallenamn</span>
+                <span class="value">@Equipment.AltID</span>
+            </div>
+            <div class="equipment-detail-item">
+                <span class="label">Serial no:</span>
+                <span class="value">@Equipment.SerialNumber</span>
+            </div>
+            <div class="equipment-detail-item">
+                <span class="label">Model:</span>
+                <span class="value">@Equipment.Model</span>
+            </div>
+            <div class="equipment-detail-item">
+                <span class="label">Brand:</span>
+                <span class="value">@Equipment.Brand</span>
+            </div>
+        </div>
+    </BodyContent>
+    <FooterContent>
             @if (AllowRemove)
             {
                 <button class="btn btn-sm btn-outline-danger remove-btn" @onclick="ShowRemoveConfirmation" aria-label="Remove equipment">
                     <i class="bi bi-trash"></i>
                 </button>
             }
-            <a class="btn btn-sm btn-outline-primary details-btn" 
-               href="@GetEquipmentDetailsUrl()" 
-               title="View Details" 
-               aria-label="View equipment details">
-                <span class="d-none d-md-inline">Details</span>
-                <i class="bi bi-chevron-right"></i>
-            </a>
-        </div>
-    </div>
-    <div class="mb-2">
-        <StatusBadge Status="@Equipment.Status" />
-    </div>
-    <div class="equipment-details">
-        <div class="equipment-detail-item">
-            <span class="label">Eq. no:</span>
-            <span class="value">@Equipment.EquipmentNumber</span>
-        </div>
-        <div class="equipment-detail-item">
-            <span class="label">Serial no:</span>
-            <span class="value">@Equipment.SerialNumber</span>
-        </div>
-        <div class="equipment-detail-item">
-            <span class="label">Model:</span>
-            <span class="value">@Equipment.Model</span>
-        </div>
-        <div class="equipment-detail-item">
-            <span class="label">Brand:</span>
-            <span class="value">@Equipment.Brand</span>
-        </div>
-        @if (!string.IsNullOrEmpty(Equipment.AltID))
-        {
-            <div class="equipment-detail-item">
-                <span class="label">Alt ID:</span>
-                <span class="value">@Equipment.AltID</span>
-            </div>
-        }
-    </div>
-</div>
+    </FooterContent>
+</Card>
 
 @if (showRemoveConfirmation)
 {
@@ -105,16 +92,15 @@
         await OnRemove.InvokeAsync();
     }
 
-    private string GetEquipmentDetailsUrl()
+    private void NavigateToEquipment()
     {
         string baseUrl = $"/equipment/{Equipment.EquipmentNumber}";
         
         // Only append the returnUrl if TicketId has a value
         if (TicketId.HasValue && TicketId.Value > 0)
         {
-            return $"{baseUrl}?returnUrl=tickets/{TicketId.Value}";
+            baseUrl = $"{baseUrl}?returnUrl=tickets/{TicketId.Value}";
         }
-        
-        return baseUrl;
+        Navigation.NavigateTo(baseUrl);
     }
 }

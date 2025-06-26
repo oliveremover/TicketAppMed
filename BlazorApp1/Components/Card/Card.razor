@@ -1,0 +1,95 @@
+@rendermode InteractiveServer
+
+<div class="card-container @(IsClickable ? "clickable" : "")" @onclick="HandleClick" @attributes="AdditionalAttributes">
+    <div class="card-content">
+        <div class="card-header-content">
+
+            @if (HeaderContent != null)
+            {
+                <div class="header-content">
+                    @HeaderContent
+                </div>
+            }
+        </div>
+    
+        <div class="card-title">
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <h3 class="title-text">@Title</h3>
+            }
+            else if (TitleContent != null)
+            {
+                @TitleContent
+            }
+        </div>
+        
+        @if (BodyContent != null)
+        {
+            <div class="card-body-content">
+                @BodyContent
+            </div>
+        }
+        
+        @if (FooterContent != null)
+        {
+            <div class="card-footer-content">
+                @FooterContent
+            </div>
+        }
+        
+        @if (ActionContent != null)
+        {
+            <div class="card-actions">
+                @ActionContent
+            </div>
+        }
+    </div>
+    @if (ShowChevron)
+    {
+        <div class="chevron">
+            <i class="bi bi-chevron-right"></i>
+        </div>
+    }
+</div>
+
+@code {
+
+
+    [Parameter]
+    public string? Title { get; set; }
+    
+    [Parameter]
+    public bool IsClickable { get; set; } = true;
+    
+    [Parameter]
+    public EventCallback OnClick { get; set; }
+    
+    [Parameter]
+    public RenderFragment? HeaderContent { get; set; }
+    
+    [Parameter]
+    public RenderFragment? TitleContent { get; set; }
+    
+    [Parameter]
+    public bool ShowChevron { get; set; } = false;
+
+    [Parameter]
+    public RenderFragment? BodyContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? FooterContent { get; set; }
+    
+    [Parameter]
+    public RenderFragment? ActionContent { get; set; }
+    
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object>? AdditionalAttributes { get; set; }
+    
+    private async Task HandleClick()
+    {
+        if (IsClickable && OnClick.HasDelegate)
+        {
+            await OnClick.InvokeAsync();
+        }
+    }
+}

@@ -1,0 +1,98 @@
+.card-container {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+.card-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.card-container.clickable {
+    cursor: pointer;
+}
+
+.card-container.clickable:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-container.clickable:active {
+    transform: scale(0.99);
+}
+
+/* Header section with ID and status */
+.card-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-grow: 1;
+}
+
+/* Title section */
+.card-title {
+    margin-bottom: 4px;
+}
+
+.title-text {
+    font-weight: 600;
+    font-size: 15px;
+    color: #212529;
+    margin: 0 0 4px 0;
+    line-height: 1.4;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+
+.card-body-content {
+    font-size: 13px;
+    margin-bottom: 8px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: #6c757d;
+}
+
+/* Footer section */
+.card-footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: auto;
+}
+
+/* Actions section */
+.card-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.chevron {
+    color: #adb5bd;
+    margin-left: 12px;
+}
