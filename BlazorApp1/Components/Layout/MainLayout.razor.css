@@ -2,6 +2,8 @@
     position: relative;
     display: flex;
     flex-direction: column;
+    background-color: #f8f9fa;
+    min-height: 100vh
 }
 
 #blazor-error-ui {
@@ -24,5 +26,5 @@
 }
 
 .main-content {
-    margin-bottom: 70px; /* give room for the bottom nav */
+    min-height: 92vh;
 }

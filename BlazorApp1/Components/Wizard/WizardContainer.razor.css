@@ -1,7 +1,6 @@
 .wizard-container {
     background-color: #f8f9fa;
     color: #212529;
-    min-height: 100vh;
     display: flex;
     flex-direction: column;
     padding-bottom: 80px;
