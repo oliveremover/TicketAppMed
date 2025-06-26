@@ -3,28 +3,19 @@
 @using BlazorApp1.Models
 @using BlazorApp1.Services
 @using Microsoft.AspNetCore.WebUtilities
+@using BlazorApp1.Components.Header
 @rendermode InteractiveServer
 
 <CascadingValue Value="Model">
+    @if (Step == 1)
+    {
+        <Header Title="Ny Sak" ShowBackButton=false ShowCloseButton=true CloseUrl="/tickets" />
+    }
+    else
+    {
+        <Header Title="Ny Sak" ShowBackButton=true OnBackAction="Prev" ShowCloseButton=true CloseUrl="/tickets" />
+    }
     <div class="wizard-container">
-        <div class="sticky-header-group">
-            <div>
-                <div class="d-flex align-items-center justify-content-between border-bottom py-2 px-2">
-                    @if (Step != 1)
-                    {
-                    <button type="button" class="btn px-2 m-2" aria-label="Back" @onclick="Prev">
-                        <i class="bi bi-chevron-left"></i>
-                    </button>
-                    }
-                    <div class="flex-grow-1 text-center">
-                        <span class="fw-medium fs-4">Ny sak</span>
-                    </div>
-                    <button type="button" class="btn px-2 m-2" aria-label="Close" @onclick="@(()=>Navigation.NavigateTo("/tickets"))">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
-                </div>
-            </div>
-        </div>
         <div class="content-area">
             @if (Step == 1)
             {

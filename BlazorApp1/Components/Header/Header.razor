@@ -1,0 +1,177 @@
+@rendermode InteractiveServer
+@inject NavigationManager NavigationManager
+
+@if (ShouldShowHeader())
+{
+    <div class="sticky-header-group">
+        <div class="@GetHeaderClasses()">
+            @if (ShowBackButton)
+            {
+                <button aria-label="@BackButtonAriaLabel" class="navigation-button back-button" @onclick="HandleBackNavigation" type="button">
+                    <i class="bi bi-arrow-left"></i>
+                </button>
+            }
+            else if (NeedsLeftPlaceholder())
+            {
+                <div class="navigation-button-placeholder"></div>
+            }
+
+            @if (!string.IsNullOrEmpty(Title))
+            {
+                <h3 class="header-title @(ShouldCenterTitle() ? "centered" : "")">@Title</h3>
+            }
+            
+            @if (ActionContent != null)
+            {
+                <div class="header-action">
+                    @ActionContent
+                </div>
+            }
+            
+            @if (ShowCloseButton)
+            {
+                <button aria-label="@CloseButtonAriaLabel" class="navigation-button close-button" @onclick="HandleCloseAction" type="button">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            }
+            else if (NeedsRightPlaceholder())
+            {
+                <div class="navigation-button-placeholder"></div>
+            }
+        </div>
+        
+        @if (ChildContent != null)
+        {
+            <div class="header-additional-content">
+                @ChildContent
+            </div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public string Title { get; set; } = "";
+    
+    [Parameter] public bool ShowBackButton { get; set; } = true;
+    
+    [Parameter] public bool ShowCloseButton { get; set; } = false;
+    
+    [Parameter] public bool CenterTitle { get; set; } = false;
+    
+    [Parameter] public string BackUrl { get; set; } = "";
+    
+    [Parameter] public string CloseUrl { get; set; } = "";
+    
+    [Parameter] public string BackButtonAriaLabel { get; set; } = "Navigate back";
+    
+    [Parameter] public string CloseButtonAriaLabel { get; set; } = "Close";
+    
+    [Parameter] public EventCallback OnBackAction { get; set; }
+    
+    [Parameter] public EventCallback OnCloseAction { get; set; }
+    
+    [Parameter] public RenderFragment? ActionContent { get; set; }
+    
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    
+    [Parameter] public string AdditionalHeaderClass { get; set; } = "";
+    
+    private bool ShouldShowHeader()
+    {
+        // Show header if any of these conditions are true:
+        // - Has a non-empty title
+        // - Has back or close buttons
+        // - Has action content
+        // - Has child content
+        return !string.IsNullOrEmpty(Title) || 
+               ShowBackButton || 
+               ShowCloseButton || 
+               ActionContent != null || 
+               ChildContent != null;
+    }
+    
+    private bool HasHeaderContent()
+    {
+        // Check if the header itself has content (not including ChildContent)
+        return !string.IsNullOrEmpty(Title) ||
+               ShowBackButton || 
+               ShowCloseButton || 
+               ActionContent != null;
+    }
+    
+    private string GetHeaderClasses()
+    {
+        var classes = new List<string>();
+        
+        // Only apply the app-header class if the header has content
+        if (HasHeaderContent())
+        {
+            classes.Add("app-header");
+            
+            if (!string.IsNullOrEmpty(AdditionalHeaderClass))
+            {
+                classes.Add(AdditionalHeaderClass);
+            }
+        }
+        
+        return string.Join(" ", classes);
+    }
+    
+    private bool NeedsLeftPlaceholder()
+    {
+        // Only add left placeholder if:
+        // 1. We don't show back button
+        // 2. We have a title that's centered OR a close button
+        return !ShowBackButton && (ShouldCenterTitle() || ShowCloseButton);
+    }
+    
+    private bool NeedsRightPlaceholder()
+    {
+        // Only add right placeholder if:
+        // 1. We don't show close button
+        // 2. We have a back button AND centered title
+        return !ShowCloseButton && ShowBackButton && ShouldCenterTitle();
+    }
+    
+    private bool ShouldCenterTitle()
+    {
+        // Center title if:
+        // - CenterTitle parameter is true, OR
+        // - We have BOTH back and close buttons to balance the UI
+        return CenterTitle || (ShowBackButton && ShowCloseButton);
+    }
+
+    private async Task HandleBackNavigation()
+    {
+        if (OnBackAction.HasDelegate)
+        {
+            await OnBackAction.InvokeAsync();
+        }
+        else if (!string.IsNullOrEmpty(BackUrl))
+        {
+            NavigationManager.NavigateTo(BackUrl);
+        }
+        else
+        {
+            // Default behavior: go back in navigation history
+            NavigationManager.NavigateTo("javascript:history.back()");
+        }
+    }
+
+    private async Task HandleCloseAction()
+    {
+        if (OnCloseAction.HasDelegate)
+        {
+            await OnCloseAction.InvokeAsync();
+        }
+        else if (!string.IsNullOrEmpty(CloseUrl))
+        {
+            NavigationManager.NavigateTo(CloseUrl);
+        }
+        else
+        {
+            // Default behavior for close button (typically used in modal/wizard)
+            NavigationManager.NavigateTo("/");
+        }
+    }
+}

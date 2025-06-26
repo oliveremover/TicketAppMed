@@ -3,33 +3,29 @@
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
 @using BlazorApp1.Components.Notification
+@using BlazorApp1.Components.Header
 
 <PageTitle>Home</PageTitle>
 
-<div class="home-container">
-<!-- Sticky header group -->
-    <div class="sticky-header-group">
-        <!-- Search header -->
-        <div class="search-header">
-            <div class="search-bar-container">
-                <div class="search-bar">
-                    <i class="fas fa-search search-icon"></i>
-                    <input type="text" 
-                           placeholder="Search Ticket Number" 
-                           @bind="searchTerm"
-                           @bind:event="oninput" />
-                    @if (!string.IsNullOrEmpty(searchTerm))
-                    {
-                        <button class="clear-btn" @onclick="ClearSearch">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    }
-                </div>
-                <NotificationBadge />
-            </div>
+<Header ShowBackButton="false">
+    <ActionContent>
+        <div class="search-bar">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" 
+                    placeholder="Search Ticket Number" 
+                    @bind="searchTerm"
+                    @bind:event="oninput" />
+            @if (!string.IsNullOrEmpty(searchTerm))
+            {
+                <button class="clear-btn" @onclick="ClearSearch">
+                    <i class="fas fa-times"></i>
+                </button>
+            }
         </div>
-    </div>
-
+        <NotificationBadge />
+    </ActionContent>
+</Header>
+<div class="home-container">
     <!-- Content area -->
     <div class="content-area">
         <h1>Welcome Home</h1>

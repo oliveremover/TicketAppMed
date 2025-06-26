@@ -9,15 +9,11 @@
 
 <PageTitle>Equipment Details</PageTitle>
 
-<div class="equipment-detail-container">
-    <!-- Back button header -->
-    <div class="equipment-header">
-        <button aria-label="Navigate back" class="back-button" @onclick="GoBack">
-            <i class="bi bi-arrow-left"></i>
-        </button>
-        <h3 class="mb-0">Equipment Details</h3>
-    </div>
+<Header Title="Equipment Details" ShowBackButton="true">
 
+</Header>
+
+<div class="equipment-detail-container">
     @if (isLoading)
     {
         <div class="loading-container">

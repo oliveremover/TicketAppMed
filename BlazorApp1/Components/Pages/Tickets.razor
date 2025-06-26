@@ -9,10 +9,8 @@
 
 <PageTitle>Tickets</PageTitle>
 
-<div class="ticket-container">
-    <!-- Sticky header group -->
-    <div class="sticky-header-group">
-        <!-- Search header -->
+<Header ShowBackButton="false">
+    <ChildContent>
         <div class="search-header">
             <div class="search-bar">
                 <i class="fas fa-search search-icon"></i>
@@ -28,28 +26,26 @@
                 }
             </div>
         </div>
-
-        <!-- Filter by category with divider and dropdown -->
+        
         <div class="filter-container">
             <div class="filter-wrap">
-                <!-- Left side: My and All buttons -->
+                <!-- Filter content -->
                 <div class="primary-filters">
                     <button class="filter-chip @(showMyTickets ? "active" : "")" 
                             @onclick="() => FilterMyTickets(true)">
                         My
                         <span>@GetMyTicketsCount()</span>
                     </button>
-                    <button class="filter-chip @(!showMyTickets && selectedCategory == null ? "active" : "")" 
+                    <button class="filter-chip @(!showMyTickets ? "active" : "")" 
                             @onclick="() => FilterMyTickets(false)">
                         All
                         <span>@GetAllTicketsCount()</span>
                     </button>
                 </div>
                 
-                <!-- Vertical divider -->
                 <div class="filter-divider"></div>
                 
-                <!-- Right side: Category dropdown for mobile -->
+                <!-- Category dropdown -->
                 <div class="category-dropdown">
                     <button class="filter-chip @(selectedCategory != null ? "active-filter" : "")" 
                             @onclick="@(selectedCategory != null 
@@ -93,8 +89,10 @@
                 </div>
             </div>
         </div>
-    </div>
+    </ChildContent>
+</Header>
 
+<div class="ticket-container">
     @if (tickets == null)
     {
         <!-- Skeleton loader for list items -->

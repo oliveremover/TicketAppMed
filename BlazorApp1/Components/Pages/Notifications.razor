@@ -6,24 +6,19 @@
 @using BlazorApp1.Models
 @using BlazorApp1.Services
 @using BlazorApp1.Components.StatusBadge
+@using BlazorApp1.Components.Header
 
 <PageTitle>Notifications</PageTitle>
 
-<div class="notifications-container">
-    <!-- Sticky header group following the pattern used in other pages -->
-    <div class="sticky-header-group">
-        <div class="notifications-header">
-            <button aria-label="Navigate back" class="back-button" @onclick="NavigateBack">
-                <i class="bi bi-arrow-left"></i>
-            </button>
-            <h3>Notifications</h3>
-            @if (notifications?.Any(n => !n.IsRead) == true)
+<Header Title="Notifications" ShowBackButton="true" BackUrl="/">
+    <ActionContent>
+         @if (notifications?.Any(n => !n.IsRead) == true)
             {
                 <button class="btn btn-sm btn-link" @onclick="MarkAllAsRead">Mark all as read</button>
             }
-        </div>
-    </div>
-
+    </ActionContent>
+</Header>
+<div class="notifications-container">
     @if (isLoading)
     {
         <div class="loading-container">

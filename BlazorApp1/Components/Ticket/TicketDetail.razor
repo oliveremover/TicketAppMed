@@ -11,15 +11,12 @@
 
 <PageTitle>Ticket Details</PageTitle>
 
-<div class="ticket-detail-container">
-    <!-- Back button header -->
-    <div class="ticket-header">
-        <button aria-label="Navigate back" class="back-button" @onclick="NavigateBack">
-            <i class="bi bi-arrow-left"></i>
-        </button>
-        <h3 class="mb-0">Ticket Details</h3>
-    </div>
+<Header 
+    Title="Ticket Details" 
+    BackUrl="/tickets">
+</Header>
 
+<div class="ticket-detail-container">
     @if (ticket == null)
     {
         <div class="loading-container">
@@ -385,11 +382,6 @@
         {
             ticket.Equipment = await EquipmentService.GetEquipmentByNumberAsync(ticket.EquipmentNumber.Value);
         }
-    }
-
-    private void NavigateBack()
-    {
-        Navigation.NavigateTo("/tickets");
     }
     
     private void EditTicket()
