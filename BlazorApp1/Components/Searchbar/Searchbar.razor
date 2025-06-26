@@ -1,0 +1,124 @@
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+
+<div class="search-bar">
+    <i class="@IconClass search-icon"></i>
+    <input type="text" 
+           placeholder="@Placeholder" 
+           @bind="CurrentSearchTerm"
+           @bind:event="oninput" 
+           @onkeyup="HandleKeyUp"
+           @ref="searchInput"
+           autocomplete="off" />
+    @if (!string.IsNullOrEmpty(CurrentSearchTerm))
+    {
+        <button class="clear-btn" @onclick="ClearSearch" aria-label="Clear search">
+            <i class="@ClearIconClass"></i>
+        </button>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Placeholder { get; set; } = "Search...";
+
+    [Parameter]
+    public string SearchTerm { get; set; } = "";
+
+    [Parameter]
+    public EventCallback<string> SearchTermChanged { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnSearch { get; set; }
+
+    [Parameter]
+    public bool AutoSearch { get; set; } = true;
+
+    [Parameter]
+    public int DebounceTime { get; set; } = 300;
+
+    [Parameter]
+    public string IconClass { get; set; } = "bi bi-search";
+
+    [Parameter]
+    public string ClearIconClass { get; set; } = "bi bi-x";
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public Dictionary<string, object> AdditionalAttributes { get; set; } = new();
+
+    private string CurrentSearchTerm
+    {
+        get => SearchTerm;
+        set
+        {
+            if (SearchTerm != value)
+            {
+                SearchTerm = value;
+                SearchTermChanged.InvokeAsync(value);
+                
+                if (AutoSearch)
+                {
+                    DebounceSearch();
+                }
+            }
+        }
+    }
+
+    private ElementReference searchInput;
+    private Timer? debounceTimer;
+
+    protected override void OnInitialized()
+    {
+        debounceTimer = new Timer(_ => InvokeAsync(() => 
+        {
+            OnSearch.InvokeAsync(SearchTerm);
+            debounceTimer?.Change(Timeout.Infinite, Timeout.Infinite);
+        }), null, Timeout.Infinite, Timeout.Infinite);
+    }
+
+    private void DebounceSearch()
+    {
+        debounceTimer?.Change(DebounceTime, Timeout.Infinite);
+    }
+
+    private void ClearSearch()
+    {
+        CurrentSearchTerm = "";
+        // Immediately trigger search when cleared
+        OnSearch.InvokeAsync("");
+        
+        // Focus back on the input
+        _ = FocusSearchInput();
+    }
+
+    private async Task FocusSearchInput()
+    {
+        try
+        {
+            await searchInput.FocusAsync();
+        }
+        catch 
+        {
+            // Ignore focus errors
+        }
+    }
+
+    private void HandleKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            // Immediately trigger search on Enter key
+            OnSearch.InvokeAsync(CurrentSearchTerm);
+        }
+    }
+
+    public async ValueTask FocusAsync()
+    {
+        await FocusSearchInput();
+    }
+
+    public void Dispose()
+    {
+        debounceTimer?.Dispose();
+    }
+}

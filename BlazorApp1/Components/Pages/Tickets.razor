@@ -12,19 +12,11 @@
 <Header ShowBackButton="false">
     <ChildContent>
         <div class="search-header">
-            <div class="search-bar">
-                <i class="fas fa-search search-icon"></i>
-                <input type="text" 
-                       placeholder="Search Ticket" 
-                       @bind="searchTerm"
-                       @bind:event="oninput" />
-                @if (!string.IsNullOrEmpty(searchTerm))
-                {
-                    <button class="clear-btn" @onclick="ClearSearch">
-                        <i class="bi bi-x"></i>
-                    </button>
-                }
-            </div>
+            <Searchbar 
+                @bind-SearchTerm="searchTerm" 
+                OnSearch="HandleSearch"
+                Placeholder="Search Ticket" 
+                IconClass="fas fa-search" />
         </div>
         
         <div class="filter-container">
@@ -248,5 +240,10 @@
     private IEnumerable<string> GetUniqueCategories()
     {
         return tickets?.Select(t => t.Category).Where(c => c != null).Distinct().Cast<string>() ?? Array.Empty<string>();
+    }
+
+    private void HandleSearch(string term)
+    {
+        // Your search implementation
     }
 }

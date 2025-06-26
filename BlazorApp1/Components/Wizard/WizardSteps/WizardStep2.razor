@@ -13,19 +13,11 @@
             @if (selectedEquipment == null)
             {
                 <div class="search-header mb-3">
-                    <div class="search-bar">
-                        <i class="bi bi-search search-icon"></i>
-                        <input type="text" placeholder="Søk etter utstyr" 
-                               @bind-value="searchTerm" 
-                               @bind-value:event="oninput" 
-                               @onkeyup="SearchEquipment" />
-                        @if (!string.IsNullOrEmpty(searchTerm))
-                        {
-                            <button class="clear-btn" @onclick="ClearSearch">
-                                <i class="bi bi-x"></i>
-                            </button>
-                        }
-                    </div>
+                    <Searchbar 
+                        @bind-SearchTerm="searchTerm" 
+                        OnSearch="SearchEquipment"
+                        Placeholder="Søk etter utstyr" 
+                        IconClass="bi bi-search" />
                 </div>
             }
             

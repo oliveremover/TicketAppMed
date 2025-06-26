@@ -4,24 +4,16 @@
 @inject NavigationManager Navigation
 @using BlazorApp1.Components.Notification
 @using BlazorApp1.Components.Header
-
+@using BlazorApp1.Components.Searchbar
 <PageTitle>Home</PageTitle>
 
 <Header ShowBackButton="false">
     <ActionContent>
-        <div class="search-bar">
-            <i class="fas fa-search search-icon"></i>
-            <input type="text" 
-                    placeholder="Search Ticket Number" 
-                    @bind="searchTerm"
-                    @bind:event="oninput" />
-            @if (!string.IsNullOrEmpty(searchTerm))
-            {
-                <button class="clear-btn" @onclick="ClearSearch">
-                    <i class="fas fa-times"></i>
-                </button>
-            }
-        </div>
+        <Searchbar 
+            @bind-SearchTerm="searchTerm" 
+            OnSearch="HandleSearch"
+            Placeholder="Search Ticket Number"
+            IconClass="fas fa-search" />
         <NotificationBadge />
     </ActionContent>
 </Header>
@@ -40,9 +32,10 @@
 @code {
     private string searchTerm = "";
 
-    private void ClearSearch()
+    private void HandleSearch(string term)
     {
-        searchTerm = "";
+        // Handle search logic here
+        Console.WriteLine($"Searching for: {term}");
     }
 }
 
