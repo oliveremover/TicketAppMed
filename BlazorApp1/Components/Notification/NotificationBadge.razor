@@ -1,0 +1,44 @@
+@inject INotificationService NotificationService
+@implements IDisposable
+@rendermode InteractiveServer
+
+<div class="notification-badge-container">
+    <button class="btn btn-link notification-btn" title="Notifications" @onclick="NavigateToNotifications">
+        <i class="bi bi-bell-fill"></i>
+        @if (unreadCount > 0)
+        {
+            <span class="notification-indicator"></span>
+        }
+    </button>
+</div>
+
+@code {
+    private int unreadCount = 0;
+    
+    [Inject]
+    public NavigationManager NavigationManager { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        NotificationService.OnNotificationCountChanged += StateHasChanged;
+        await RefreshUnreadCount();
+    }
+
+    private async Task RefreshUnreadCount()
+    {
+        // This will ensure the notifications are loaded
+        await NotificationService.GetNotificationsAsync();
+        unreadCount = NotificationService.UnreadCount;
+        StateHasChanged();
+    }
+
+    private void NavigateToNotifications()
+    {
+        NavigationManager.NavigateTo("/notifications");
+    }
+
+    public void Dispose()
+    {
+        NotificationService.OnNotificationCountChanged -= StateHasChanged;
+    }
+}

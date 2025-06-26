@@ -1,0 +1,28 @@
+.notification-badge-container {
+    position: relative;
+    display: inline-block;
+}
+
+.notification-btn {
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    position: relative;
+}
+
+.notification-btn i {
+    font-size: 18px;
+}
+
+.notification-indicator {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    width: 10px;
+    height: 10px;
+    background-color: #dc3545; /* Bootstrap danger red */
+    border-radius: 50%;
+    border: 1px solid white;
+}

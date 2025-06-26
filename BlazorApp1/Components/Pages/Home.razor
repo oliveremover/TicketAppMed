@@ -2,6 +2,7 @@
 @inherits LayoutComponentBase
 @rendermode InteractiveServer
 @inject NavigationManager Navigation
+@using BlazorApp1.Components.Notification
 
 <PageTitle>Home</PageTitle>
 
@@ -24,9 +25,7 @@
                         </button>
                     }
                 </div>
-                <button class="btn btn-link notification-btn" title="Notifications" @onclick='() => Navigation.NavigateTo("/notifications")'>
-                    <i class="bi bi-bell-fill"></i>
-                </button>
+                <NotificationBadge />
             </div>
         </div>
     </div>
@@ -41,7 +40,6 @@
         <Btn AriaLabel="Add Ticket button" IconOnly=true NavigateTo="/createTicket" />
     </div>
 </div>
-
 
 @code {
     private string searchTerm = "";

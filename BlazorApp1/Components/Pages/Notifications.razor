@@ -1,7 +1,7 @@
 @page "/notifications"
 @inherits LayoutComponentBase
 @rendermode InteractiveServer
-@inject ITicketService TicketService
+@inject INotificationService NotificationService
 @inject NavigationManager Navigation
 @using BlazorApp1.Models
 @using BlazorApp1.Services
@@ -17,7 +17,7 @@
                 <i class="bi bi-arrow-left"></i>
             </button>
             <h3>Notifications</h3>
-            @if (notifications?.Any() == true)
+            @if (notifications?.Any(n => !n.IsRead) == true)
             {
                 <button class="btn btn-sm btn-link" @onclick="MarkAllAsRead">Mark all as read</button>
             }
@@ -45,7 +45,7 @@
         <div class="notifications-list">
             @foreach (var notification in notifications)
             {
-                <div class="notification-item @(notification.IsRead ? "" : "unread")" @onclick="() => NavigateToTicket(notification.TicketId)">
+                <div class="notification-item @(notification.IsRead ? "" : "unread")" @onclick="() => NavigateToTicket(notification)">
                     <div class="notification-avatar">
                         <div class="avatar-circle">
                             <span>@GetInitials(notification.Author)</span>
@@ -75,17 +75,6 @@
     private List<NotificationItem> notifications;
     private bool isLoading = true;
 
-    // This represents a notification in our system
-    private class NotificationItem
-    {
-        public int Id { get; set; }
-        public int TicketId { get; set; }
-        public string Message { get; set; }
-        public string Author { get; set; }
-        public DateTime Date { get; set; }
-        public bool IsRead { get; set; }
-    }
-
     protected override async Task OnInitializedAsync()
     {
         await LoadNotificationsAsync();
@@ -96,41 +85,7 @@
         try
         {
             isLoading = true;
-            
-            // In a real application, you would fetch notifications from a service
-            // For now, we'll create mock data based on tickets and their comments
-            var tickets = await TicketService.GetAllTicketsAsync();
-            notifications = new List<NotificationItem>();
-            
-            if (tickets?.Any() == true)
-            {
-                int notificationId = 1;
-                foreach (var ticket in tickets)
-                {
-                    // For demonstration purposes, convert each comment into a notification
-                    if (ticket.Comments?.Any() == true)
-                    {
-                        foreach (var comment in ticket.Comments.OrderByDescending(c => c.Date).Take(3))
-                        {
-                            if (comment.Author != "current.user@example.com") // Don't notify about own comments
-                            {
-                                notifications.Add(new NotificationItem
-                                {
-                                    Id = notificationId++,
-                                    TicketId = ticket.ID,
-                                    Message = comment.Text,
-                                    Author = comment.Author,
-                                    Date = comment.Date,
-                                    IsRead = false
-                                });
-                            }
-                        }
-                    }
-                }
-            }
-            
-            // Sort notifications by date (newest first)
-            notifications = notifications.OrderByDescending(n => n.Date).ToList();
+            notifications = await NotificationService.GetNotificationsAsync();
         }
         finally
         {
@@ -143,24 +98,21 @@
         Navigation.NavigateTo("/");
     }
 
-    private void NavigateToTicket(int ticketId)
+    private async Task NavigateToTicket(NotificationItem notification)
     {
         // Mark the notification as read when clicked
-        var notification = notifications.FirstOrDefault(n => n.TicketId == ticketId && !n.IsRead);
-        if (notification != null)
+        if (!notification.IsRead)
         {
-            notification.IsRead = true;
+            await NotificationService.MarkAsReadAsync(notification.Id);
         }
         
-        Navigation.NavigateTo($"/tickets/{ticketId}");
+        Navigation.NavigateTo($"/tickets/{notification.TicketId}");
     }
 
-    private void MarkAllAsRead()
+    private async Task MarkAllAsRead()
     {
-        foreach (var notification in notifications)
-        {
-            notification.IsRead = true;
-        }
+        await NotificationService.MarkAllAsReadAsync();
+        await LoadNotificationsAsync();
     }
 
     private string GetRelativeTime(DateTime date)

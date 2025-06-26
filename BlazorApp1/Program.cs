@@ -10,6 +10,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddScoped<ITicketService, TicketService>();
 builder.Services.AddScoped<IEquipmentService, EquipmentService>();
+builder.Services.AddScoped<INotificationService, NotificationService>();
 
 var app = builder.Build();
 
